@@ -5,7 +5,7 @@
 .pt-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
 .pt-strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cds-gap-xs) var(--cds-gap-lg); margin: var(--cds-gap-sm) 0 0; font-size: max(.875rem, var(--cds-font-size-caption)); color: var(--color-fg-muted); }
 .pt-strip b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
-.pt-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--cds-gap-md); }
+.pt-tiles { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--cds-gap-md); }
 .pt-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-xs); align-content: start; min-width: 0; }
 .pt-label { color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
 .pt-big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 2.2rem; line-height: 1.1; }
@@ -85,11 +85,12 @@
 .pt-pop-close { margin-top: var(--cds-gap-xs); padding: 8px 16px; min-height: 40px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); font: inherit; cursor: pointer; }
 [data-dash-source-state=refreshing] { opacity: .5; }
 /* Host muted grey is 3.4:1 on the light background; this mix is about 5.6:1 light and 6.9:1 dark. */
-.pt { --color-fg-muted: color-mix(in srgb, var(--color-fg) 62%, var(--color-bg)); container-type: inline-size; }
+/* Capped and centred so a wide pane does not leave the header and tiles stranded at opposite edges. */
+.pt { --color-fg-muted: color-mix(in srgb, var(--color-fg) 62%, var(--color-bg)); container-type: inline-size; width: 100%; max-width: 75rem; margin-inline: auto; }
 .pt-head { display: grid; gap: var(--cds-gap-md) var(--cds-gap-xl); align-items: start; }
 .pt-head-main, .pt-head-side { display: grid; gap: var(--cds-gap-sm); min-width: 0; }
 .pt-head :is(.pt-strip, .pt-lede) { margin: 0; }
-.pt-next { margin: 0; display: grid; gap: var(--cds-gap-xs); max-width: 60ch; padding: var(--cds-pad-md) var(--cds-pad-lg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); font-size: var(--cds-font-size-heading); line-height: 1.4; }
+.pt-next { margin: 0; display: grid; gap: var(--cds-gap-xs); padding: var(--cds-pad-md) var(--cds-pad-lg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); font-size: var(--cds-font-size-heading); line-height: 1.4; }
 .pt-next b { font-weight: var(--cds-font-weight-medium); }
 .pt-head-side #market { display: grid; gap: 2px; }
 .pt-head-side #market > span { display: flex; justify-content: space-between; gap: var(--cds-gap-md); }
@@ -101,6 +102,7 @@
 #risk-legend > span:first-child { flex-basis: 100%; }
 .pt-growth-body { display: grid; gap: var(--cds-gap-sm); }
 .pt-tiles > .pt-note { grid-column: 1 / -1; margin: 0; }
+@container (min-width: 600px) { .pt-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 </style>
 
 <div class="pt">
@@ -167,7 +169,8 @@
     <div class="pt-h2row"><h2>What to do</h2><button class="pt-help" type="button" popovertarget="help-plan" aria-label="How to read: What to do">?</button></div>
     <div class="pt-pop" id="help-plan" popover>
       <h2>What to do</h2>
-      <p><b>What it shows.</b> For each {{fund}}: its share now, its target, and the next action. Each {{fund}}’s returns are in “Your {{funds}}, year by year”.</p>
+      <p><b>What it shows.</b> For each {{fund}}: its share now, its target, the next action, its return over the last year and its yearly cost. Year-by-year returns are in “Your {{funds}}, year by year”.</p>
+      {{help_cost}}
       <p><b>Why it matters.</b> Your to-do list, plus a quick health check on each {{fund}}.</p>
       <p><b>Tax.</b> Any tax figure on this page is an estimate only, not tax advice. Confirm with a tax professional or the tax authority. The tracker and its author accept no liability.</p>
       <button class="pt-pop-close" popovertarget="help-plan" popovertargetaction="hide">Close</button>
@@ -180,6 +183,8 @@
           <th data-field="now_pct">Now</th>
           <th data-field="target_pct">Target</th>
           <th data-field="action" class="pt-text">Do</th>
+          <th data-field="ret_1y_pct">1 year</th>
+          <th data-field="ter_pct">Cost/yr</th>
         </tr></thead>
         <tbody data-draw="plan"></tbody>
       </table>
@@ -785,6 +790,8 @@ dash.draw('plan', (tbody) => {
     cell(f.pct(r.now_pct));
     cell(f.pct(r.target_pct));
     cell(r.action, 'pt-text');
+    cell(r.ret_1y_pct == null ? '—' : r.month_is_annualized ? `${r.ret_1y_pct.toFixed(2)}% /yr` : f.signedpct(r.ret_1y_pct));
+    cell(r.ter_pct == null ? '—' : `${r.ter_pct.toFixed(2)}%`);
   }
 });
 
