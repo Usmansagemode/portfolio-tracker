@@ -19,5 +19,6 @@
  },
  "fy_start": 1,
  "app": "broker app",
- "tax_rate_on_gains": 0.15
+ "tax_rate_on_gains": 0.15,
+ "amounts": "none"
 }

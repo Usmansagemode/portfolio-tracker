@@ -11,7 +11,7 @@ import datetime, json, os, re, sys
 
 SKILL = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MONTHS = "January February March April May June July August September October November December".split()
-JS_SLOTS = ("cash", "index_name", "fy_start_day", "report", "fund", "Fund")  # these also land inside JS '…' strings
+JS_SLOTS = ("cash", "index_name", "fy_start_day", "report", "fund", "Fund", "money_symbol")  # these also land inside JS '…' strings
 
 
 def account_slots(cfg, funds, target, allocations):
@@ -25,7 +25,7 @@ def account_slots(cfg, funds, target, allocations):
     start = min(r["date"] for r in allocations)
     return {
         "title": cfg["name"], "plan": cfg["plan"], "cash": cfg["cash"], "app": cfg["app"],
-        "index_name": cfg["index"]["name"], "money_word": cfg["currency"]["name"],
+        "index_name": cfg["index"]["name"], "money_word": cfg["currency"]["name"], "money_symbol": cfg["currency"]["symbol"],
         "fy_start": str(fy),
         "fy_start_day": f"1 {MONTHS[fy - 1]}",
         "fy_name": "fiscal year" if fy > 1 else "year",
@@ -67,7 +67,7 @@ def build(account):
 
 if __name__ == "__main__":
     # self-check: fiscal-year words for a July start and a January start
-    s7 = account_slots({"fy_start": 7, "name": "", "plan": "", "cash": "C", "app": "", "index": {"name": ""}, "currency": {"name": ""}},
+    s7 = account_slots({"fy_start": 7, "name": "", "plan": "", "cash": "C", "app": "", "index": {"name": ""}, "currency": {"name": "", "symbol": "Rs"}},
                        [{"fund": "C", "risk": "Low"}, {"fund": "X", "risk": "High"}], [{"fund": "X", "pct": 0}],
                        [{"entry": 1, "date": "2026-11-09", "fund": "C", "pct": 100}])
     assert (s7["fy_header"], s7["fy_span"], s7["start_date"]) == ("Fiscal year (Jul–Jun)", "July to June", "9 Nov 2026")

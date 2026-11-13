@@ -92,8 +92,9 @@
 .pt-head :is(.pt-strip, .pt-lede) { margin: 0; }
 .pt-next { margin: 0; display: grid; gap: var(--cds-gap-xs); padding: var(--cds-pad-md) var(--cds-pad-lg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); font-size: var(--cds-font-size-heading); line-height: 1.4; }
 .pt-next b { font-weight: var(--cds-font-weight-medium); }
-.pt-head-side #market { display: grid; gap: 2px; }
-.pt-head-side #market > span { display: flex; justify-content: space-between; gap: var(--cds-gap-md); }
+.pt-head-side :is(#market, #money) { display: grid; gap: 2px; }
+.pt-head-side :is(#market, #money) > span { display: flex; justify-content: space-between; gap: var(--cds-gap-md); }
+#money[hidden] { display: none; }
 @container (min-width: 760px) {
   .pt-head { grid-template-columns: minmax(0, 1fr) minmax(240px, 22rem); }
   .pt-head-side { padding-left: var(--cds-gap-lg); border-left: 1px solid var(--color-border-line); }
@@ -118,6 +119,13 @@
       <p class="pt-next" id="next-step"><span class="pt-label">Next step</span> <b data-draw="val" data-source="next" data-field="next" data-row="0">—</b></p>
     </div>
     <div class="pt-head-side">
+      <p class="pt-strip" id="money" hidden>
+        <span>Your money <b data-draw="val" data-source="amounts" data-field="value" data-row="0" data-fmt="money">—</b></span>
+        <span>Gain to date <b data-draw="val" data-source="amounts" data-field="to_date_gain" data-row="0" data-fmt="signedmoney" data-tone="sign">—</b></span>
+        <span>Added since <b data-draw="val" data-source="amounts" data-field="added_since" data-row="0" data-fmt="money">—</b></span>
+        <span>1 point ≈ <b data-draw="val" data-source="amounts" data-field="point" data-row="0" data-fmt="money">—</b></span>
+        <span>as of <span data-draw="val" data-source="amounts" data-field="date" data-row="0" data-fmt="date">—</span></span>
+      </p>
       <p class="pt-strip" id="market">
         <span>Inflation (CPI) <b data-draw="val" data-source="market" data-field="cpi_yoy_pct" data-row="0" data-fmt="pct">—</b></span>
         <span>Policy rate <b data-draw="val" data-source="market" data-field="policy_rate_pct" data-row="0" data-fmt="pct">—</b></span>
@@ -342,6 +350,7 @@
 <script>
 window.PT = (() => {
   const isNum = (v) => typeof v === 'number' && isFinite(v);
+  const MONEY = /[A-Za-z]$/.test('$') ? '$ ' : '$';
   const dec = (v) => (v !== 0 && Math.abs(v) < 1 ? 2 : 1);
   const RESULT = { win: '▲ Winning', lose: '▼ Losing', even: '= Even', planned: '◇ Planned', info: '—', early: 'Too early to judge' };
   const fmt = {
@@ -353,6 +362,8 @@ window.PT = (() => {
     date: (v) => (v ? d3.utcFormat('%-d %b %Y')(d3.utcParse('%Y-%m-%d')(v)) : '—'),
     month: (v) => (v ? d3.utcFormat('%b %Y')(d3.utcParse('%Y-%m')(v)) : '—'),
     result: (v) => RESULT[v] ?? '—',
+    money: (v) => (isNum(v) ? `${MONEY}${d3.format(',')(Math.round(v))}` : '—'),
+    signedmoney: (v) => (isNum(v) ? `${v > 0 ? '+' : v < 0 ? '−' : ''}${MONEY}${d3.format(',')(Math.round(Math.abs(v)))}` : '—'),
   };
   const toneClass = (v) => (v === 'win' ? 'pt-good' : v === 'lose' ? 'pt-bad' : v === 'planned' ? 'pt-warn' : '');
   // Risk level drives colour and shape everywhere: Low = ok/circle, Medium = warn/diamond, High = bad/triangle.
@@ -644,6 +655,9 @@ dash.onData(() => {
   document.querySelectorAll('.pt [data-sw-line]').forEach((sw) => {
     sw.style.borderColor = dash.colors[+sw.dataset.swLine % dash.colors.length];
   });
+  // Amounts are optional: shown only when private/amounts.json was uploaded at publish.
+  const m = dash.data('amounts');
+  document.querySelector('.pt #money').hidden = !(m && m.status === 'ok' && m.data.length);
   const b = dash.data('bench'), a = dash.data('actual');
   const growthWaiting = b.status === 'ok' && b.data.length < 2 && !(a.status === 'ok' && a.data.length > 1);
   document.querySelectorAll('.pt [data-growth-state]').forEach((p) => { p.hidden = (p.dataset.growthState === 'waiting') !== growthWaiting; });

@@ -6,6 +6,7 @@ a commit or the dashboard; those hold percentages only.
   python3 -I money.py status                    holdings, % of total, gain, tax if sold (latest date)
   python3 -I money.py snapshot                  % return between the last two dates -> row for data/snapshots.json
   python3 -I money.py move CODE=5 CODE2=1.7 [--from CODE3]   amount for each move (pts of total), tax if taken from a holding
+  python3 -I money.py page                      private/amounts.json for the dashboard's "Your money" block (uploaded only on publish, never committed)
 
 private/holdings.csv   needs date,fund,value,to_date_gain; other columns (units, unit_price, ...) are kept but unused
 private/cashflows.csv  date,fund,amount,note   (money in > 0, money out < 0; a cash dividend counts as money out)
@@ -52,6 +53,15 @@ def status(snaps, tax):
     print(DISCLAIMER)
 
 
+def page_row(snaps, flows):
+    """Totals for the dashboard: latest holdings, gain to date, money added since, and what 1 point of the portfolio is."""
+    date, funds = list(snaps.items())[-1]
+    value = sum(f["value"] for f in funds.values())
+    added = sum(float(r["amount"]) for r in flows if r["date"] > date)
+    return dict(date=date, value=round(value), to_date_gain=round(sum(f["to_date_gain"] for f in funds.values())),
+                added_since=round(added), point=round((value + added) / 100))
+
+
 def snapshot(snaps, flows):
     dates = list(snaps)
     if len(dates) < 2:
@@ -84,18 +94,30 @@ def move(snaps, args, tax, sym):
 if __name__ == "__main__":
     # self-check: 100 + 50 added, ending at 165 -> +10%
     assert abs(period_return(100, 165, 50) - 0.10) < 1e-12
+    assert page_row({"2026-01-01": {"A": {"value": 150, "to_date_gain": 10}}}, [{"date": "2026-01-02", "amount": "50"}, {"date": "2026-01-01", "amount": "9"}]) == \
+        dict(date="2026-01-01", value=150, to_date_gain=10, added_since=50, point=2)
     args = sys.argv[1:]
-    if not args or args[0] not in ("status", "snapshot", "move"):
+    if not args or args[0] not in ("status", "snapshot", "move", "page"):
         sys.exit(__doc__)
     if not os.path.isfile("portfolio.json"):
         sys.exit("Run from the account folder (the one holding portfolio.json and private/).")
     cfg = json.load(open("portfolio.json", encoding="utf-8"))
+    mode = cfg.get("amounts", "none")
+    if mode == "none":
+        sys.exit('portfolio.json "amounts" is "none" (percentages only). Set it to "private" or "dashboard" to keep amounts.')
+    if args[0] == "page" and mode != "dashboard":
+        sys.exit('portfolio.json "amounts" is not "dashboard", so amounts stay off the page.')
     tax = float(args[args.index("--tax") + 1]) if "--tax" in args else cfg.get("tax_rate_on_gains", 0)
     if not tax:
         print("No tax rate set (portfolio.json tax_rate_on_gains), so tax shows as 0.")
     snaps = by_date(read("holdings.csv"))
     if args[0] == "status":
         status(snaps, tax)
+    elif args[0] == "page":
+        path = os.path.join("private", "amounts.json")
+        json.dump([page_row(snaps, read("cashflows.csv"))], open(path, "w"), indent=1)
+        os.chmod(path, 0o600)
+        print(f"wrote {path} (amounts: dashboard only, never commit it)")
     elif args[0] == "snapshot":
         snapshot(snaps, read("cashflows.csv"))
     else:

@@ -15,7 +15,8 @@
 | `fy_start` | 7 (July) / 1 (January) | year tables, "since the start of each year", year-to-date |
 | `app` | "UBL app" / "broker app" | page note: growth won't match the gain % in your {app} |
 | `tax_rate_on_gains` | 0.20 / 0.15 | `money.py` flat tax estimate (not tax advice) |
-| `text` | `{"help_score_read": "<p>…</p>"}` | optional overrides of any key in `templates/text.json` for this account's plan |
+| `amounts` | "none" / "private" / "dashboard" | the user's choice: percentages only; amounts kept in `private/` and shown in chat; or that plus totals on the dashboard. Missing = "none". Changeable any time (SKILL.md). |
+| `text` | `{"help_since_watch": "<p>…</p>"}` | optional overrides of any key in `templates/text.json` for this account's plan |
 
 Values that also land inside JS strings (`cash`, `index.name`, and the source's `fund`, `Fund`, `report` words) must not contain `'` or `\`; `build_page.py` checks.
 

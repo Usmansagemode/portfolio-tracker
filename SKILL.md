@@ -11,7 +11,8 @@ One account, one currency, one folder. Each account folder is independent and ge
 
 ```
 portfolio.json       account settings (keys in references/files.md)
-log.md               Portfolio History Log and the agreed target. Read it first, every run.
+CLAUDE.md            the account's own facts: mandate, plan notes, standing facts about its holdings, timing. Read it first, every run.
+log.md               Portfolio History Log and the agreed target. Read it next.
 checks.json          known calc values and test scenarios for check_calcs.js
 data/*.json          the datasets the dashboard reads (schemas in references/files.md)
 data/index.html      dashboard page, built by build_page.py. Never edit it by hand.
@@ -47,7 +48,7 @@ Its job is to answer "am I doing well, and what next?". Page order: summary line
 
 ## Rules
 
-1. **Amounts only in `private/`.** `data/`, `log.md`, commits and the dashboard hold percentages only. Holdings screenshots and deposits go to `private/holdings.csv` and `private/cashflows.csv`. Show amounts in chat only when the user asks. API keys live only in an environment variable or `private/keys.env`, which the user writes; never read, print or copy a key, and never read other `.env` files or credentials.
+1. **Amounts only in `private/`, and only as the user chose.** `data/`, `log.md` and commits always hold percentages only. `portfolio.json` `amounts` is the user's choice: `"none"` (percentages only; nothing in `private/`), `"private"` (holdings screenshots and deposits go to `private/holdings.csv` and `private/cashflows.csv`; amounts shown in chat only when asked) or `"dashboard"` (as `"private"`, plus totals on the page from `private/amounts.json`, uploaded at publish: `references/publishing.md`, "Amounts"). Missing means `"none"`. API keys live only in an environment variable or `private/keys.env`, which the user writes; never read, print or copy a key, and never read other `.env` files or credentials.
 2. **Local first.** Every update is written to the account folder. The dashboard changes only when the user says "publish" (`references/publishing.md`). End other updates with: "Dashboard not yet updated, say publish."
 3. **Allocations sum to 100% (±0.01).** If they don't, ask before logging.
 4. **Numbers over words.** Lead with a table: `Code | Now % | Target % | Do | Why (one number)`. "Why" is one figure, e.g. "+0.9%/yr vs cash", "−9.9% FYTD". A line or two of prose at most.
@@ -59,10 +60,10 @@ Its job is to answer "am I doing well, and what next?". Page order: summary line
 
 ## Set up a new account
 
-1. Ask once, in one message, for everything: account name, currency, country, the holdings (any tickers or funds) with current % or amounts, the target % per holding, the cash holding, the benchmark, plan and horizon, and a flat tax rate on gains (an estimate). Pick the source from the holdings. Offer defaults to accept, from the country file if there is one (e.g. a T-bill ETF as cash, a broad-market ETF as benchmark).
-2. Create the folder with `git init`, a `.gitignore` holding `private/` and `*.env`, `mkdir -m 700 private`, and the hook: `ln -sf $S/pre-commit .git/hooks/pre-commit`. Write `portfolio.json`.
+1. Ask once, in one message, for everything: account name, currency, country, the holdings (any tickers or funds) with current % or amounts, the target % per holding, the cash holding, the benchmark, plan and horizon, a flat tax rate on gains (an estimate), and how to track: percentages only, or amounts too (kept local, or local plus totals on the dashboard). Say this can be changed later. Pick the source from the holdings. Offer defaults to accept, from the country file if there is one (e.g. a T-bill ETF as cash, a broad-market ETF as benchmark).
+2. Create the folder with `git init`, a `.gitignore` holding `private/` and `*.env`, `mkdir -m 700 private`, and the hook: `ln -sf $S/pre-commit .git/hooks/pre-commit`. Write `portfolio.json`, and a short `CLAUDE.md` saying the folder is an account of this skill, with the rules above and any account facts the user gives.
 3. For `prices`, run `prices.py resolve` on the holdings, the cash holding and the benchmark (`references/sources/prices.md`); it lists what it can't settle. Ask the user about those.
-4. Write `data/funds.json` (from the resolver's draft rows), `data/allocations.json` (entry 1), `data/target.json`, `data/log_notes.json`, `data/snapshots.json` (first row `return_since_last_pct: null`) and log entry #01 in `log.md`. If the user gave amounts, write them to `private/holdings.csv` (`chmod 600`), compute each holding's % from it, and store only the %.
+4. Write `portfolio.json` `amounts` from that answer, then `data/funds.json` (from the resolver's draft rows), `data/allocations.json` (entry 1), `data/target.json`, `data/log_notes.json`, `data/snapshots.json` (first row `return_since_last_pct: null`) and log entry #01 in `log.md`. If the user chose amounts and gave them, write them to `private/holdings.csv` (`chmod 600`), compute each holding's % from it, and store only the %. With `"none"`, use any amounts given only to compute the %, and keep nothing.
 5. Load the figures as the source file says, then `build_page.py`, then `check_calcs.js`.
 6. Create the dashboard only when the user says "publish": `references/publishing.md`, "First publish".
 
@@ -81,10 +82,20 @@ Its job is to answer "am I doing well, and what next?". Page order: summary line
 ## When the user shares a holdings screenshot (snapshot)
 
 Ask for one after each trade settles, and once a month. It must show every holding's current value.
+
+With `amounts: "none"`: compute each holding's % from the screenshot and keep no amount. For the return, ask for the % change the app shows since the last snapshot and whether money was added or withdrawn (as % of the portfolio), then do steps 3 and 4.
+
 1. Append each holding's row to `private/holdings.csv` and any deposit, withdrawal or cash dividend since the last snapshot to `private/cashflows.csv`. Compute each holding's %. If any differs from the last log entry by more than 0.5 pts, or a trade happened, add a log entry (rationale "Snapshot", or the trade).
 2. Ask whether money was added or withdrawn and whether a dividend was paid out in cash (it counts as a withdrawal). Run `money.py snapshot`: `r = V_end / (V_start + new_money) − 1`, new money assumed to land at the start of the period.
 3. Append its row to `data/snapshots.json`. Reply in %; add amounts only if asked.
 4. Run `check_calcs.js` and show the `score` rows (growth, vs cash, vs inflation).
+
+## When the user changes the amounts choice
+
+Set `portfolio.json` `amounts` and say what changes. Percentage history is never touched.
+- **To `"private"` or `"dashboard"`:** `mkdir -m 700 private`; amounts start from the next holdings screenshot (`money.py snapshot` needs two dated snapshots for a return; earlier returns stay as logged). For `"dashboard"`, the "Your money" block appears at the next publish.
+- **From `"dashboard"` to `"private"` or `"none"`:** at the next publish, delete the `datasets/amounts` document and its blob, and remove `amounts` from `data/published.json`; the block hides itself. Do it now if the user says publish.
+- **To `"none"`:** ask whether to delete `private/holdings.csv`, `cashflows.csv` and `amounts.json` or keep them; never delete them without a yes.
 
 ## When new monthly figures are out
 
