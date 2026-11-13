@@ -1,0 +1,17 @@
+[
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "rationale": "Sample start (made-up percentages).",
+  "verdict": "Mostly cash: equity 30% against a 90% target.",
+  "planned": false
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "rationale": "Sample step: 25 pts moved from SGOV into the two Shariah ETFs and the four stocks.",
+  "verdict": "On plan. Equity 55%.",
+  "planned": false,
+  "next": "Early Dec: move 4 pts from SGOV to HLAL, 4 to SPUS, 2 each to NVDA, MU and AMD, and 1 to BABA."
+ }
+]

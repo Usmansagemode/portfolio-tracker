@@ -1,0 +1,41 @@
+{
+ "default": {
+  "help_since_watch": "<p><b>Watch out.</b> Big past gains came with big swings, and past returns do not predict future ones.</p>"
+ },
+ "ubl-fmr": {
+  "fund": "fund",
+  "funds": "funds",
+  "Fund": "Fund",
+  "Funds": "Funds",
+  "report": "fund report",
+  "risk_legend": "Fund risk, UBL’s own rating:",
+  "pa_note": "In the top row, cash and income funds show % a year (/yr).",
+  "help_bm": "<p><b>The bm line.</b> bm = benchmark, the market or rate the fund is measured against. ▲ the fund beat it, ▼ it fell short. That judges the fund manager, separately from whether you made money.</p>",
+  "help_years_why": "<p><b>Why it matters.</b> It shows how much each fund swings: share funds from about −18% to +90% in a year, cash funds a steady 6–22%. That is why shares go in month by month and are held for 5+ years.</p>",
+  "years_hint": "<p class=\"pt-hint\">How each fund did in each year on its own. Share funds swing a lot; cash funds stay steady.</p>",
+  "years_note": "<p class=\"pt-note\">Top row is this fiscal year so far. Green = gain, red = loss. Small line: bm = benchmark, the market or rate the fund is measured against (e.g. the KMI-30 share index for ASSF). ▲ the fund beat it, ▼ it fell short. Full years are the return for that year. In the top row, money-market and income funds show % a year (/yr), the others plain %. Blank = fund not running a full year yet. AIRSF has no published benchmark.</p>",
+  "def_estimate": "<dt>Growth (estimate)</dt><dd>Used until actual snapshots exist. Each month: Σ fund % × that fund’s NAV change from the UBL report, chained from 100. Ignores loads, tax and mid-month timing.</dd>",
+  "def_equity": "<dt>Equity exposure</dt><dd>Each fund’s % × the share of that fund invested in stocks (from the fund report).</dd>",
+  "def_risk": "<dt>Fund risk</dt><dd>UBL’s own risk profile for each fund, from its monthly report: Low (money market), Medium (income and asset allocation), High (shares). The pension fund is rated “allocation dependent” by UBL; it is tracked as its Equity Sub-Fund, so it shows as High. Within a level, funds are ordered by how much their price swings (standard deviation in the report).</dd>",
+  "def_years": "<dt>Year by year</dt><dd>Full years: worked out from the fund report’s since-launch return at each 30 June, (1 + this June) ÷ (1 + last June) − 1. A fund’s launch year is left out because it was only part of a year. Top row: fiscal-year-to-date from the latest report.</dd>",
+  "def_since": "<dt>Total gain since</dt><dd>Each year’s return multiplied together from {{fy_start_day}} of that year to the latest report. This year’s money-market and income figure is turned from % a year into plain % (× days so far ÷ 365) before chaining.</dd>"
+ },
+ "prices": {
+  "fund": "holding",
+  "funds": "holdings",
+  "Fund": "Holding",
+  "Funds": "Holdings",
+  "report": "price update",
+  "risk_legend": "Risk, from how much each price swings:",
+  "pa_note": "In the top row, the cash holding shows % a year (/yr).",
+  "help_bm": "<p><b>The bm line.</b> bm = benchmark, {{index_name}} over the same time. ▲ the holding beat it, ▼ it fell short. That tells you whether owning it beat simply owning the index, separately from whether you made money.</p>",
+  "help_years_why": "<p><b>Why it matters.</b> It shows how much each holding swings from year to year. The bigger the swings, the more buying in monthly steps and holding for 5+ years matter.</p>",
+  "years_hint": "<p class=\"pt-hint\">How each holding did in each year on its own. Single stocks swing a lot; cash stays steady.</p>",
+  "years_note": "<p class=\"pt-note\">Top row is this year so far. Green = gain, red = loss. Small line: bm = {{index_name}} over the same time. ▲ the holding beat it, ▼ it fell short. Returns include dividends. In the top row the cash holding shows % a year (/yr). Blank = not listed for that full year.</p>",
+  "def_estimate": "<dt>Growth (estimate)</dt><dd>Used until actual snapshots exist. Each month: Σ holding % × that holding’s month-end total return (adjusted close), chained from 100. Ignores trading costs, tax and mid-month timing.</dd>",
+  "def_equity": "<dt>Equity exposure</dt><dd>Each holding’s % × the share of it invested in stocks: 100% for a stock or stock ETF, 0% for cash and bonds, as set in the holdings list.</dd>",
+  "def_risk": "<dt>Holding risk</dt><dd>From how much the price swings: annualised volatility of up to the last 60 monthly returns (at least 36). Low under 5%, Medium 5% to 15%, High 15% and up, the cut-offs of the EU fund risk scale (SRRI classes 1–3, 4–5, 6–7). Listed from steadiest to most volatile.</dd>",
+  "def_years": "<dt>Year by year</dt><dd>Full years: adjusted close at the end of {{fy_end_month}} ÷ the one a year earlier − 1, dividends and splits included. A holding’s first, part year is left out. Top row: {{fy_name}}-to-date from the latest month-end.</dd>",
+  "def_since": "<dt>Total gain since</dt><dd>Each year’s return multiplied together from {{fy_start_day}} of that year to the latest month-end. This year’s cash figure is turned from % a year into plain % (× days so far ÷ 365) before chaining.</dd>"
+ }
+}

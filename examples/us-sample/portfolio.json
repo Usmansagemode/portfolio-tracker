@@ -1,0 +1,23 @@
+{
+ "name": "US Portfolio Tracker (sample)",
+ "source": "prices",
+ "country": "us",
+ "currency": {
+  "code": "USD",
+  "symbol": "$",
+  "name": "dollars"
+ },
+ "plan": "growth, 5+ years",
+ "cash": "SGOV",
+ "index": {
+  "name": "S&P 500 (SPY)",
+  "symbol": "SPY"
+ },
+ "fred": {
+  "cpi": "CPIAUCSL",
+  "policy_rate": "FEDFUNDS"
+ },
+ "fy_start": 1,
+ "app": "broker app",
+ "tax_rate_on_gains": 0.15
+}

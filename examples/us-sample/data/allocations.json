@@ -1,0 +1,86 @@
+[
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "SGOV",
+  "pct": 70
+ },
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "HLAL",
+  "pct": 6
+ },
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "SPUS",
+  "pct": 14
+ },
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "NVDA",
+  "pct": 4
+ },
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "BABA",
+  "pct": 2
+ },
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "MU",
+  "pct": 2
+ },
+ {
+  "entry": 1,
+  "date": "2026-07-01",
+  "fund": "AMD",
+  "pct": 2
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "SGOV",
+  "pct": 45
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "HLAL",
+  "pct": 12
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "SPUS",
+  "pct": 22
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "NVDA",
+  "pct": 8
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "BABA",
+  "pct": 3
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "MU",
+  "pct": 5
+ },
+ {
+  "entry": 2,
+  "date": "2026-10-01",
+  "fund": "AMD",
+  "pct": 5
+ }
+]

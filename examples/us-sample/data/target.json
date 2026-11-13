@@ -1,0 +1,44 @@
+[
+ {
+  "fund": "SGOV",
+  "pct": 10,
+  "action": "Pays for the monthly steps until it reaches 10%",
+  "set_on": "2026-07-01"
+ },
+ {
+  "fund": "HLAL",
+  "pct": 25,
+  "action": "Add 4 pts a month from SGOV",
+  "set_on": "2026-07-01"
+ },
+ {
+  "fund": "SPUS",
+  "pct": 30,
+  "action": "Add 4 pts a month from SGOV",
+  "set_on": "2026-07-01"
+ },
+ {
+  "fund": "NVDA",
+  "pct": 12,
+  "action": "Add 2 pts a month from SGOV",
+  "set_on": "2026-07-01"
+ },
+ {
+  "fund": "BABA",
+  "pct": 5,
+  "action": "Add 1 pt a month from SGOV",
+  "set_on": "2026-07-01"
+ },
+ {
+  "fund": "MU",
+  "pct": 9,
+  "action": "Add 2 pts a month from SGOV",
+  "set_on": "2026-07-01"
+ },
+ {
+  "fund": "AMD",
+  "pct": 9,
+  "action": "Add 2 pts a month from SGOV",
+  "set_on": "2026-07-01"
+ }
+]

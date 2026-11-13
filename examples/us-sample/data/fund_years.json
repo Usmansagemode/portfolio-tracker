@@ -1,0 +1,344 @@
+[
+ {
+  "fund": "SGOV",
+  "fy": 2021,
+  "return_pct": 0.04,
+  "bench_pct": null
+ },
+ {
+  "fund": "SGOV",
+  "fy": 2022,
+  "return_pct": 1.58,
+  "bench_pct": null
+ },
+ {
+  "fund": "SGOV",
+  "fy": 2023,
+  "return_pct": 5.12,
+  "bench_pct": null
+ },
+ {
+  "fund": "SGOV",
+  "fy": 2024,
+  "return_pct": 5.28,
+  "bench_pct": null
+ },
+ {
+  "fund": "SGOV",
+  "fy": 2025,
+  "return_pct": 4.24,
+  "bench_pct": null
+ },
+ {
+  "fund": "HLAL",
+  "fy": 2020,
+  "return_pct": 24.64,
+  "bench_pct": 18.33
+ },
+ {
+  "fund": "HLAL",
+  "fy": 2021,
+  "return_pct": 28.63,
+  "bench_pct": 28.73
+ },
+ {
+  "fund": "HLAL",
+  "fy": 2022,
+  "return_pct": -17.56,
+  "bench_pct": -18.18
+ },
+ {
+  "fund": "HLAL",
+  "fy": 2023,
+  "return_pct": 30.13,
+  "bench_pct": 26.18
+ },
+ {
+  "fund": "HLAL",
+  "fy": 2024,
+  "return_pct": 16.7,
+  "bench_pct": 24.89
+ },
+ {
+  "fund": "HLAL",
+  "fy": 2025,
+  "return_pct": 18.3,
+  "bench_pct": 17.72
+ },
+ {
+  "fund": "SPUS",
+  "fy": 2020,
+  "return_pct": 25.68,
+  "bench_pct": 18.33
+ },
+ {
+  "fund": "SPUS",
+  "fy": 2021,
+  "return_pct": 35.62,
+  "bench_pct": 28.73
+ },
+ {
+  "fund": "SPUS",
+  "fy": 2022,
+  "return_pct": -22.76,
+  "bench_pct": -18.18
+ },
+ {
+  "fund": "SPUS",
+  "fy": 2023,
+  "return_pct": 34.2,
+  "bench_pct": 26.18
+ },
+ {
+  "fund": "SPUS",
+  "fy": 2024,
+  "return_pct": 26.5,
+  "bench_pct": 24.89
+ },
+ {
+  "fund": "SPUS",
+  "fy": 2025,
+  "return_pct": 19.78,
+  "bench_pct": 17.72
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2016,
+  "return_pct": 226.96,
+  "bench_pct": 12.0
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2017,
+  "return_pct": 81.99,
+  "bench_pct": 21.71
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2018,
+  "return_pct": -30.82,
+  "bench_pct": -4.57
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2019,
+  "return_pct": 76.94,
+  "bench_pct": 31.22
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2020,
+  "return_pct": 122.3,
+  "bench_pct": 18.33
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2021,
+  "return_pct": 125.48,
+  "bench_pct": 28.73
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2022,
+  "return_pct": -50.26,
+  "bench_pct": -18.18
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2023,
+  "return_pct": 239.02,
+  "bench_pct": 26.18
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2024,
+  "return_pct": 171.25,
+  "bench_pct": 24.89
+ },
+ {
+  "fund": "NVDA",
+  "fy": 2025,
+  "return_pct": 38.92,
+  "bench_pct": 17.72
+ },
+ {
+  "fund": "BABA",
+  "fy": 2016,
+  "return_pct": 8.05,
+  "bench_pct": 12.0
+ },
+ {
+  "fund": "BABA",
+  "fy": 2017,
+  "return_pct": 96.37,
+  "bench_pct": 21.71
+ },
+ {
+  "fund": "BABA",
+  "fy": 2018,
+  "return_pct": -20.51,
+  "bench_pct": -4.57
+ },
+ {
+  "fund": "BABA",
+  "fy": 2019,
+  "return_pct": 54.74,
+  "bench_pct": 31.22
+ },
+ {
+  "fund": "BABA",
+  "fy": 2020,
+  "return_pct": 9.73,
+  "bench_pct": 18.33
+ },
+ {
+  "fund": "BABA",
+  "fy": 2021,
+  "return_pct": -48.96,
+  "bench_pct": 28.73
+ },
+ {
+  "fund": "BABA",
+  "fy": 2022,
+  "return_pct": -25.84,
+  "bench_pct": -18.18
+ },
+ {
+  "fund": "BABA",
+  "fy": 2023,
+  "return_pct": -10.83,
+  "bench_pct": 26.18
+ },
+ {
+  "fund": "BABA",
+  "fy": 2024,
+  "return_pct": 11.77,
+  "bench_pct": 24.89
+ },
+ {
+  "fund": "BABA",
+  "fy": 2025,
+  "return_pct": 75.8,
+  "bench_pct": 17.72
+ },
+ {
+  "fund": "MU",
+  "fy": 2016,
+  "return_pct": 54.8,
+  "bench_pct": 12.0
+ },
+ {
+  "fund": "MU",
+  "fy": 2017,
+  "return_pct": 87.59,
+  "bench_pct": 21.71
+ },
+ {
+  "fund": "MU",
+  "fy": 2018,
+  "return_pct": -22.84,
+  "bench_pct": -4.57
+ },
+ {
+  "fund": "MU",
+  "fy": 2019,
+  "return_pct": 69.49,
+  "bench_pct": 31.22
+ },
+ {
+  "fund": "MU",
+  "fy": 2020,
+  "return_pct": 39.79,
+  "bench_pct": 18.33
+ },
+ {
+  "fund": "MU",
+  "fy": 2021,
+  "return_pct": 24.21,
+  "bench_pct": 28.73
+ },
+ {
+  "fund": "MU",
+  "fy": 2022,
+  "return_pct": -45.93,
+  "bench_pct": -18.18
+ },
+ {
+  "fund": "MU",
+  "fy": 2023,
+  "return_pct": 71.93,
+  "bench_pct": 26.18
+ },
+ {
+  "fund": "MU",
+  "fy": 2024,
+  "return_pct": -0.96,
+  "bench_pct": 24.89
+ },
+ {
+  "fund": "MU",
+  "fy": 2025,
+  "return_pct": 240.24,
+  "bench_pct": 17.72
+ },
+ {
+  "fund": "AMD",
+  "fy": 2016,
+  "return_pct": 295.12,
+  "bench_pct": 12.0
+ },
+ {
+  "fund": "AMD",
+  "fy": 2017,
+  "return_pct": -9.35,
+  "bench_pct": 21.71
+ },
+ {
+  "fund": "AMD",
+  "fy": 2018,
+  "return_pct": 79.57,
+  "bench_pct": -4.57
+ },
+ {
+  "fund": "AMD",
+  "fy": 2019,
+  "return_pct": 148.43,
+  "bench_pct": 31.22
+ },
+ {
+  "fund": "AMD",
+  "fy": 2020,
+  "return_pct": 99.98,
+  "bench_pct": 18.33
+ },
+ {
+  "fund": "AMD",
+  "fy": 2021,
+  "return_pct": 56.91,
+  "bench_pct": 28.73
+ },
+ {
+  "fund": "AMD",
+  "fy": 2022,
+  "return_pct": -54.99,
+  "bench_pct": -18.18
+ },
+ {
+  "fund": "AMD",
+  "fy": 2023,
+  "return_pct": 127.59,
+  "bench_pct": 26.18
+ },
+ {
+  "fund": "AMD",
+  "fy": 2024,
+  "return_pct": -18.06,
+  "bench_pct": 24.89
+ },
+ {
+  "fund": "AMD",
+  "fy": 2025,
+  "return_pct": 77.3,
+  "bench_pct": 17.72
+ }
+]

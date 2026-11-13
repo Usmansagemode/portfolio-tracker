@@ -1,0 +1,58 @@
+[
+ {
+  "fund": "SGOV",
+  "name": "iShares 0-3 Month Treasury Bond ETF",
+  "category": "Cash (T-bill ETF)",
+  "equity_share_pct": 0,
+  "risk": "Low",
+  "vol_pct": 0.5
+ },
+ {
+  "fund": "HLAL",
+  "name": "Wahed FTSE USA Shariah ETF",
+  "category": "Shariah equity ETF",
+  "equity_share_pct": 100,
+  "risk": "High",
+  "vol_pct": 16.5
+ },
+ {
+  "fund": "SPUS",
+  "name": "SP Funds S&P 500 Sharia Industry Exclusions ETF",
+  "category": "Shariah equity ETF",
+  "equity_share_pct": 100,
+  "risk": "High",
+  "vol_pct": 17.3
+ },
+ {
+  "fund": "NVDA",
+  "name": "NVIDIA Corporation",
+  "category": "Stock",
+  "equity_share_pct": 100,
+  "risk": "High",
+  "vol_pct": 49.9
+ },
+ {
+  "fund": "BABA",
+  "name": "Alibaba Group Holding Limited",
+  "category": "Stock",
+  "equity_share_pct": 100,
+  "risk": "High",
+  "vol_pct": 50.5
+ },
+ {
+  "fund": "MU",
+  "name": "Micron Technology, Inc.",
+  "category": "Stock",
+  "equity_share_pct": 100,
+  "risk": "High",
+  "vol_pct": 68.6
+ },
+ {
+  "fund": "AMD",
+  "name": "Advanced Micro Devices, Inc.",
+  "category": "Stock",
+  "equity_share_pct": 100,
+  "risk": "High",
+  "vol_pct": 69.9
+ }
+]

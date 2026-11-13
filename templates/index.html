@@ -1,0 +1,860 @@
+<meta name="dash-one-writer">
+<style>
+.pt { display: grid; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); color: var(--color-fg); font-size: max(1rem, var(--cds-font-size-body)); line-height: 1.5; }
+.pt-table, .pt-table th, .pt-table td small, .pt-big { font-variant-numeric: tabular-nums; }
+.pt-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.pt-strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cds-gap-xs) var(--cds-gap-lg); margin: var(--cds-gap-sm) 0 0; font-size: max(.875rem, var(--cds-font-size-caption)); color: var(--color-fg-muted); }
+.pt-strip b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.pt-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--cds-gap-md); }
+.pt-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-xs); align-content: start; min-width: 0; }
+.pt-label { color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.pt-big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 2.2rem; line-height: 1.1; }
+.pt-cmp { font-size: max(.875rem, var(--cds-font-size-caption)); color: var(--color-fg-muted); }
+.pt-cmp b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+.pt-good { color: var(--color-ok); }
+.pt-bad { color: var(--color-bad); }
+.pt-warn { color: var(--color-warn); }
+.pt-section { display: grid; gap: var(--cds-gap-sm); min-width: 0; }
+.pt-section h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+.pt-note { font-size: max(.875rem, var(--cds-font-size-caption)); color: var(--color-fg-muted); margin: 0; max-width: 70ch; }
+.pt-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; padding: 0; list-style: none; }
+.pt-legend li { display: inline-flex; align-items: center; gap: 8px; }
+.pt-sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.pt-sw-dash { width: 14px; height: 0; border-top: 2px dashed; border-radius: 0; }
+.pt-chart { position: relative; min-height: 140px; }
+.pt-chart svg { display: block; overflow: visible; }
+.pt-chart text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+.pt-chart .pt-strong { fill: var(--color-fg); }
+.pt-chart .domain, .pt-chart .tick line { stroke: var(--cds-chart-axis); }
+.pt-chart .pt-grid line { stroke: var(--cds-chart-grid); }
+.pt-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: var(--cds-pad-sm); font-size: var(--cds-font-size-caption); color: var(--color-fg); white-space: nowrap; z-index: 3; display: grid; gap: 2px; }
+.pt-tip span:first-child { font-weight: var(--cds-font-weight-medium); }
+.pt-table-wrap { overflow-x: auto; }
+.pt-table { border-collapse: collapse; width: 100%; font-size: inherit; }
+.pt-table th, .pt-table td { padding: var(--cds-pad-xs) var(--cds-pad-sm); text-align: right; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.pt-table th:first-child, .pt-table td:first-child { text-align: left; }
+.pt-table th { font-size: max(.875rem, var(--cds-font-size-caption)); color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+.pt-table td.pt-text { white-space: normal; text-align: left; min-width: 9rem; }
+.pt-table td.pt-fund { font-weight: var(--cds-font-weight-medium); }
+/* Risk level: colour + shape, so colour is never the only cue. Low ● Medium ◆ High ▲ */
+.pt-code { display: inline-flex; align-items: center; gap: 8px; font-weight: var(--cds-font-weight-medium); white-space: nowrap; }
+.pt-code::before { content: ''; flex: none; width: 10px; height: 10px; background: var(--risk, var(--color-fg-muted)); }
+.pt-risk-low { --risk: var(--color-ok); }
+.pt-risk-low::before { border-radius: 50%; }
+.pt-risk-medium { --risk: var(--color-warn); }
+.pt-risk-medium::before { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); width: 12px; height: 12px; }
+.pt-risk-high { --risk: var(--color-bad); }
+.pt-risk-high::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); width: 12px; }
+.pt-lede { font-size: var(--cds-font-size-heading); margin: var(--cds-gap-sm) 0 0; max-width: 60ch; line-height: 1.4; }
+.pt-lede b { font-weight: var(--cds-font-weight-medium); }
+.pt-hint { margin: 0; color: var(--color-fg-muted); max-width: 70ch; }
+.pt-section { padding-top: var(--cds-gap-md); border-top: 1px solid var(--color-border-line); }
+/* Wide year tables: keep the year column in view while scrolling sideways on a phone. */
+.pt-sticky td:first-child, .pt-sticky th:first-child { position: sticky; left: 0; z-index: 1; background: var(--color-bg); }
+.pt-sticky tr.pt-now td:first-child { background: var(--color-panel); }
+.pt-up { color: var(--color-ok); }
+.pt-down { color: var(--color-bad); }
+.pt-table td small { display: block; font-size: max(.8125rem, var(--cds-font-size-caption)); color: var(--color-fg-muted); }
+.pt-table tr.pt-now td { background: var(--color-panel); font-weight: var(--cds-font-weight-medium); }
+.pt-pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--cds-font-size-caption); border: 1px solid currentColor; }
+.pt-foot summary { cursor: pointer; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.pt-foot dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--cds-gap-xs) var(--cds-gap-md); font-size: var(--cds-font-size-caption); margin: var(--cds-gap-sm) 0 0; }
+.pt-foot dt { font-weight: var(--cds-font-weight-medium); }
+.pt-foot dd { margin: 0; color: var(--color-fg-muted); }
+.pt-h2row { display: flex; align-items: center; gap: var(--cds-gap-sm); }
+.pt-help { position: relative; flex: none; min-width: 36px; height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); font: inherit; font-weight: var(--cds-font-weight-medium); cursor: pointer; }
+.pt-help, .pt-pop-close { touch-action: manipulation; }
+.pt-help::after { content: ""; position: absolute; inset: -4px; }
+.pt { --pt-ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
+@media (hover: hover) and (pointer: fine) {
+  .pt-help:hover, .pt-pop-close:hover { border-color: var(--color-fg-muted); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pt-help, .pt-pop-close { transition: transform 160ms var(--pt-ease-out), border-color 150ms ease; }
+  .pt-help:active, .pt-pop-close:active { transform: scale(0.97); }
+  /* Help card: quick fade and settle in on open; closing is instant, the user is done with it */
+  .pt-pop:popover-open { transition: opacity 180ms var(--pt-ease-out), transform 180ms var(--pt-ease-out); }
+  @starting-style { .pt-pop:popover-open { opacity: 0; transform: scale(0.97); } }
+}
+.pt-help:focus-visible, .pt-pop-close:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.pt-help-wide { font-size: max(.875rem, var(--cds-font-size-caption)); }
+.pt-pop { max-width: min(92vw, 460px); max-height: 80vh; overflow: auto; overscroll-behavior: contain; margin: auto; padding: var(--cds-pad-lg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-panel); color: var(--color-fg); box-shadow: var(--cds-shadow-popover); font-family: var(--font-anthropic-sans); line-height: 1.5; }
+.pt-pop::backdrop { background: color-mix(in srgb, var(--color-bg) 65%, transparent); }
+.pt-pop h2 { margin: 0 0 var(--cds-gap-sm); font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.pt-pop p { margin: 0 0 var(--cds-gap-sm); }
+.pt-pop-close { margin-top: var(--cds-gap-xs); padding: 8px 16px; min-height: 40px; border-radius: var(--cds-radius); border: 1px solid var(--color-border-line); background: var(--color-bg); color: var(--color-fg); font: inherit; cursor: pointer; }
+[data-dash-source-state=refreshing] { opacity: .5; }
+/* Host muted grey is 3.4:1 on the light background; this mix is about 5.6:1 light and 6.9:1 dark. */
+.pt { --color-fg-muted: color-mix(in srgb, var(--color-fg) 62%, var(--color-bg)); container-type: inline-size; }
+.pt-head { display: grid; gap: var(--cds-gap-md) var(--cds-gap-xl); align-items: start; }
+.pt-head-main, .pt-head-side { display: grid; gap: var(--cds-gap-sm); min-width: 0; }
+.pt-head :is(.pt-strip, .pt-lede) { margin: 0; }
+.pt-next { margin: 0; display: grid; gap: var(--cds-gap-xs); max-width: 60ch; padding: var(--cds-pad-md) var(--cds-pad-lg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); font-size: var(--cds-font-size-heading); line-height: 1.4; }
+.pt-next b { font-weight: var(--cds-font-weight-medium); }
+.pt-head-side #market { display: grid; gap: 2px; }
+.pt-head-side #market > span { display: flex; justify-content: space-between; gap: var(--cds-gap-md); }
+@container (min-width: 760px) {
+  .pt-head { grid-template-columns: minmax(0, 1fr) minmax(240px, 22rem); }
+  .pt-head-side { padding-left: var(--cds-gap-lg); border-left: 1px solid var(--color-border-line); }
+}
+.pt-table th.pt-text { text-align: left; width: 50%; }
+#risk-legend > span:first-child { flex-basis: 100%; }
+.pt-growth-body { display: grid; gap: var(--cds-gap-sm); }
+.pt-tiles > .pt-note { grid-column: 1 / -1; margin: 0; }
+</style>
+
+<div class="pt">
+  <header class="pt-head" id="top">
+    <div class="pt-head-main">
+      <h1>{{title}}</h1>
+      <p class="pt-strip" id="period">
+        <span>Started <b data-draw="val" data-source="history" data-field="date" data-row="0" data-fmt="date">—</b></span>
+        <span>Latest entry #<b data-draw="val" data-source="now" data-field="entry" data-row="0" data-fmt="int">—</b>, <b data-draw="val" data-source="now" data-field="date" data-row="0" data-fmt="date">—</b></span>
+        <span>Plan: {{plan}}</span>
+      </p>
+      <p class="pt-lede" id="takeaway">You are <b data-draw="val" data-source="score" data-field="now" data-where="key=progress" data-fmt="pct0">—</b> of the way to your target mix, with <b data-draw="val" data-source="score" data-field="now" data-where="key=equity" data-fmt="pct">—</b> of your money in shares (target <b data-draw="val" data-source="score" data-field="target" data-where="key=equity" data-fmt="pct">—</b>).</p>
+      <p class="pt-next" id="next-step"><span class="pt-label">Next step</span> <b data-draw="val" data-source="next" data-field="next" data-row="0">—</b></p>
+    </div>
+    <div class="pt-head-side">
+      <p class="pt-strip" id="market">
+        <span>Inflation (CPI) <b data-draw="val" data-source="market" data-field="cpi_yoy_pct" data-row="0" data-fmt="pct">—</b></span>
+        <span>Policy rate <b data-draw="val" data-source="market" data-field="policy_rate_pct" data-row="0" data-fmt="pct">—</b></span>
+        <span>{{index_name}} <b data-draw="val" data-source="market" data-field="index_close" data-row="0" data-fmt="int">—</b></span>
+        <span>as of <span data-draw="val" data-source="market" data-field="month" data-row="0" data-fmt="month">—</span></span>
+      </p>
+      <p class="pt-strip" id="risk-legend">
+        <span>{{risk_legend}}</span>
+        <span class="pt-code pt-risk-low">Low</span>
+        <span class="pt-code pt-risk-medium">Medium</span>
+        <span class="pt-code pt-risk-high">High</span>
+      </p>
+      <p class="pt-strip"><button class="pt-help pt-help-wide" type="button" popovertarget="help-page">? How to read this page</button></p>
+    </div>
+    <div class="pt-pop" id="help-page" popover>
+      <h2>How to read this page</h2>
+      <p><b>1. Summary line.</b> How far along the plan you are, and how much of your money is in shares compared with the target.</p>
+      <p><b>2. Next step.</b> The one thing to do this month.</p>
+      <p><b>3. The three tiles.</b> Is it working: growth, against cash ({{cash}}), and against inflation. No verdict until there are 12 months of data.</p>
+      <p><b>Everything below.</b> Explains those numbers. {{Funds}} are always listed low → high risk: ● Low, ◆ Medium, ▲ High. Each ? button explains its section.</p>
+      <button class="pt-pop-close" popovertarget="help-page" popovertargetaction="hide">Close</button>
+    </div>
+  </header>
+
+  <section class="pt-tiles" id="am-i-winning" aria-label="Am I winning">
+    <div class="pt-tile" id="tile-growth">
+      <span class="pt-label">Growth since start</span>
+      <span class="pt-big" data-draw="val" data-source="score" data-field="now" data-where="key=growth" data-fmt="signedpct" data-tone="judged">—</span>
+      <span class="pt-cmp"><b data-draw="val" data-source="score" data-field="result" data-where="key=growth" data-fmt="result" data-tone="result">—</b></span>
+      <span class="pt-cmp">Based on <span data-draw="val" data-source="score" data-field="basis" data-where="key=growth">—</span></span>
+      <span class="pt-cmp">Return on the money invested, deposits left out, so it won’t match the gain % in your {{app}}.</span>
+    </div>
+    <div class="pt-tile" id="tile-vs-cash">
+      <span class="pt-label">vs leaving it all in {{cash}}</span>
+      <span class="pt-big" data-draw="val" data-source="score" data-field="now" data-where="key=vs_cash" data-fmt="signedpct" data-tone="judged">—</span>
+      <span class="pt-cmp"><b data-draw="val" data-source="score" data-field="result" data-where="key=vs_cash" data-fmt="result" data-tone="result">—</b></span>
+      <span class="pt-cmp">Did moving money out of cash pay off?</span>
+    </div>
+    <div class="pt-tile" id="tile-vs-cpi">
+      <span class="pt-label">vs inflation</span>
+      <span class="pt-big" data-draw="val" data-source="score" data-field="now" data-where="key=vs_cpi" data-fmt="signedpct" data-tone="judged">—</span>
+      <span class="pt-cmp"><b data-draw="val" data-source="score" data-field="result" data-where="key=vs_cpi" data-fmt="result" data-tone="result">—</b></span>
+      <span class="pt-cmp">Is your buying power growing?</span>
+    </div>
+    <p class="pt-note">Growth is only judged after 12 months, and only beyond ±1 point: shares swing about ±3 points a month against cash, so one month means nothing.</p>
+  </section>
+
+  <section class="pt-section" id="plan">
+    <div class="pt-h2row"><h2>What to do</h2><button class="pt-help" type="button" popovertarget="help-plan" aria-label="How to read: What to do">?</button></div>
+    <div class="pt-pop" id="help-plan" popover>
+      <h2>What to do</h2>
+      <p><b>What it shows.</b> For each {{fund}}: its share now, its target, and the next action. Each {{fund}}’s returns are in “Your {{funds}}, year by year”.</p>
+      <p><b>Why it matters.</b> Your to-do list, plus a quick health check on each {{fund}}.</p>
+      <p><b>Tax.</b> Any tax figure on this page is an estimate only, not tax advice. Confirm with a tax professional or the tax authority. The tracker and its author accept no liability.</p>
+      <button class="pt-pop-close" popovertarget="help-plan" popovertargetaction="hide">Close</button>
+    </div>
+    <p class="pt-hint">Your to-do list, {{fund}} by {{fund}}.</p>
+    <div class="pt-table-wrap">
+      <table class="pt-table" data-source="compare" data-row-key="fund">
+        <thead><tr>
+          <th data-field="fund">{{Fund}}</th>
+          <th data-field="now_pct">Now</th>
+          <th data-field="target_pct">Target</th>
+          <th data-field="action" class="pt-text">Do</th>
+        </tr></thead>
+        <tbody data-draw="plan"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="pt-section" id="now-vs-target">
+    <div class="pt-h2row"><h2>Now vs target, by {{fund}}</h2><button class="pt-help" type="button" popovertarget="help-now-vs-target" aria-label="How to read: Now vs target, by {{fund}}">?</button></div>
+    <div class="pt-pop" id="help-now-vs-target" popover>
+      <h2>Now vs target, by {{fund}}</h2>
+      <p><b>What it shows.</b> Each {{fund}}’s share of your portfolio now (top bar) and its target (bottom bar), low risk at the top.</p>
+      <p><b>How to read it.</b> A top bar shorter than the bottom one is a step still to do. Equal bars = on target, hold. A {{fund}} with no target bar should be emptied over time.</p>
+      <p><b>Why it matters.</b> The quickest picture of how much of the plan is left.</p>
+      <button class="pt-pop-close" popovertarget="help-now-vs-target" popovertargetaction="hide">Close</button>
+    </div>
+    <p class="pt-hint">Bars still short of target are the monthly steps left to do.</p>
+    <ul class="pt-legend"><li><span class="pt-sw" data-sw="1"></span>Now</li><li><span class="pt-sw" data-sw="0"></span>Target</li></ul>
+    <div class="pt-chart" data-draw="mix" data-source="compare"></div>
+  </section>
+
+  <section class="pt-section" id="growth">
+    <div class="pt-h2row"><h2>Growth since start (start = 100)</h2><button class="pt-help" type="button" popovertarget="help-growth" aria-label="How to read: Growth since start (start = 100)">?</button></div>
+    <div class="pt-pop" id="help-growth" popover>
+      <h2>Growth since start (start = 100)</h2>
+      <p><b>What it shows.</b> Three lines that all start at 100: your portfolio, the same money left in {{cash}}, and inflation.</p>
+      <p><b>How to read it.</b> Your line above {{cash}} means moving out of cash is paying off. Above inflation means your buying power is growing. 103 means +3%.</p>
+      <p><b>Deposits.</b> New money is left out, so the line shows how your invested money did, not how much you added. It will not match the gain % in your {{app}}.</p>
+      <p><b>Watch out.</b> Expect dips in months when shares fall. Judge it over 12 months or more. Until two holdings screenshots exist, your line is a dashed estimate from {{fund}} prices.</p>
+      <button class="pt-pop-close" popovertarget="help-growth" popovertargetaction="hide">Close</button>
+    </div>
+    <p class="pt-hint">Your line above the {{cash}} and inflation lines means the plan is paying off. Expect dips in months when shares fall.</p>
+    <div class="pt-growth-body" data-growth-state="ready">
+    <ul class="pt-legend">
+      <li><span class="pt-sw" data-sw="0"></span>You (actual)</li>
+      <li><span class="pt-sw pt-sw-dash" data-sw-line="0"></span>You (estimate)</li>
+      <li><span class="pt-sw" data-sw="1"></span>If left in {{cash}}</li>
+      <li><span class="pt-sw" data-sw="2"></span>Inflation</li>
+    </ul>
+    <div class="pt-chart" data-draw="growth" data-source="bench actual"></div>
+    </div>
+    <p class="pt-note" data-growth-state="waiting">Only the start point so far. Estimate points come with each monthly {{report}}. Actual points come from your holdings screenshots.</p>
+  </section>
+
+  <section class="pt-section" id="years">
+    <div class="pt-h2row"><h2>Your {{funds}}, year by year</h2><button class="pt-help" type="button" popovertarget="help-years" aria-label="How to read: Your {{funds}}, year by year">?</button></div>
+    <div class="pt-pop" id="help-years" popover>
+      <h2>Your {{funds}}, year by year</h2>
+      <p><b>What it shows.</b> What each {{fund}} returned in each {{fy_name}} ({{fy_span}}) on its own. The highlighted top row is this year so far.</p>
+      <p><b>How to read it.</b> Green = the {{fund}} made money that year, red = it lost. A smaller green number is slower growth, not a loss. {{pa_note}}</p>
+      {{help_bm}}
+      {{help_years_why}}
+      <button class="pt-pop-close" popovertarget="help-years" popovertargetaction="hide">Close</button>
+    </div>
+    {{years_hint}}
+    <div class="pt-table-wrap">
+      <table class="pt-table pt-sticky" data-source="years" data-row-key="fy">
+        <thead><tr>
+          <th data-field="label">{{fy_header}}</th>
+          {{fund_headers}}
+        </tr></thead>
+        <tbody data-draw="years"></tbody>
+      </table>
+    </div>
+    {{years_note}}
+  </section>
+
+  <section class="pt-section" id="since">
+    <div class="pt-h2row"><h2>Total gain if invested at the start of each year</h2><button class="pt-help" type="button" popovertarget="help-since" aria-label="How to read: Total gain if invested at the start of each year">?</button></div>
+    <div class="pt-pop" id="help-since" popover>
+      <h2>Total gain if invested at the start of each year</h2>
+      <p><b>What it shows.</b> How much money put in on {{fy_start_day}} of that year has grown by now, every year chained together.</p>
+      <p><b>How to read it.</b> 100% = the money doubled. Read across a row to compare {{funds}} over the same years; read down a column to see longer holding periods.</p>
+      {{help_since_watch}}
+      <button class="pt-pop-close" popovertarget="help-since" popovertargetaction="hide">Close</button>
+    </div>
+    <p class="pt-hint">How much money put in on {{fy_start_day}} of that year has grown by now. Over several years, shares usually beat cash.</p>
+    <div class="pt-table-wrap">
+      <table class="pt-table pt-sticky" data-source="since" data-row-key="fy">
+        <thead><tr>
+          <th data-field="label">Invested on {{fy_start_day}} of</th>
+          {{fund_headers}}
+        </tr></thead>
+        <tbody data-draw="years"></tbody>
+      </table>
+    </div>
+    <p class="pt-note">Each row: total gain from {{fy_start_day}} of that year to the latest report, all years chained together. 100% = money doubled. After {{fund}} fees, before your tax. Green = gain, red = loss. Small line: bm = benchmark over the same time. ▲ the {{fund}} beat it, ▼ it fell short.</p>
+  </section>
+
+  <section class="pt-section" id="history">
+    <div class="pt-h2row"><h2>Allocation at each log entry</h2><button class="pt-help" type="button" popovertarget="help-history" aria-label="How to read: Allocation at each log entry">?</button></div>
+    <div class="pt-pop" id="help-history" popover>
+      <h2>Allocation at each log entry</h2>
+      <p><b>What it shows.</b> Your mix at each log entry and the target mix, as bars that add up to 100%. Low risk on the left, high risk on the right.</p>
+      <p><b>How to read it.</b> Green = low risk, amber = medium, red = high. The red part should grow toward the target bar as the monthly steps go in.</p>
+      <p><b>Why it matters.</b> You can see how your risk level has changed over time at a glance.</p>
+      <button class="pt-pop-close" popovertarget="help-history" popovertargetaction="hide">Close</button>
+    </div>
+    <p class="pt-hint">How your mix changed at each step, low risk on the left, high on the right.</p>
+    <ul class="pt-legend" data-draw="legend" data-source="funds"></ul>
+    <div class="pt-chart" data-draw="stack" data-source="allocations target funds"></div>
+  </section>
+
+  <section class="pt-section" id="log">
+    <div class="pt-h2row"><h2>Log</h2><button class="pt-help" type="button" popovertarget="help-log" aria-label="How to read: Log">?</button></div>
+    <div class="pt-pop" id="help-log" popover>
+      <h2>Log</h2>
+      <p><b>What it shows.</b> Every change you made, why, and the verdict at the time, with the shares % and progress to target at that point.</p>
+      <p><b>Why it matters.</b> Your record for deciding whether to change course, and a trail of when money moved, which helps with tax.</p>
+      <p><b>Tax.</b> Any tax figure on this page is an estimate only, not tax advice. Confirm with a tax professional or the tax authority. The tracker and its author accept no liability.</p>
+      <button class="pt-pop-close" popovertarget="help-log" popovertargetaction="hide">Close</button>
+    </div>
+    <p class="pt-hint">Every change you made, with the reason.</p>
+    <div class="pt-table-wrap">
+      <table class="pt-table" data-source="log_notes" data-row-key="entry">
+        <thead><tr>
+          <th data-field="entry">#</th>
+          <th data-field="date">Date</th>
+          <th data-source="history" data-field="equity_pct">Equity</th>
+          <th data-source="history" data-field="progress_pct">Toward target</th>
+          <th data-field="rationale" class="pt-text">Why</th>
+          <th data-field="verdict" class="pt-text">Verdict</th>
+        </tr></thead>
+        <tbody data-draw="log"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details class="pt-foot" id="definitions">
+    <summary>How each number is worked out</summary>
+    <dl>
+      <dt>Growth (actual)</dt><dd>From your holdings screenshots: each period’s return = value at end ÷ (value at start + new money added) − 1, chained from 100. Deposits are left out, so it shows how the money invested did, not how much the balance grew. Only the % is stored, never {{money_word}}.</dd>
+      {{def_estimate}}
+      <dt>vs {{cash}} / vs inflation</dt><dd>Your growth minus what the same money would have done left in {{cash}} (its % a year × days ÷ 365), or minus inflation (year-on-year CPI scaled to the days), over the same dates as your holdings snapshots. No verdict until 12 months of data; after that, Winning or Losing only beyond ±1 point.</dd>
+      {{def_equity}}
+      <dt>Moved toward target</dt><dd>1 − (still to move ÷ still to move at start). “Still to move” is half the sum of |now − target| across {{funds}}. A planned step back (like consolidating first) is marked Planned, not Lose.</dd>
+      {{def_risk}}
+      {{def_years}}
+      {{def_since}}
+    </dl>
+  </details>
+</div>
+
+<script>
+window.PT = (() => {
+  const isNum = (v) => typeof v === 'number' && isFinite(v);
+  const dec = (v) => (v !== 0 && Math.abs(v) < 1 ? 2 : 1);
+  const RESULT = { win: '▲ Winning', lose: '▼ Losing', even: '= Even', planned: '◇ Planned', info: '—', early: 'Too early to judge' };
+  const fmt = {
+    pct: (v) => (isNum(v) ? `${v.toFixed(dec(v))}%` : '—'),
+    pct0: (v) => (isNum(v) ? `${Math.round(v) || 0}%` : '—'),
+    signedpct: (v) => (isNum(v) ? `${v > 0 ? '+' : ''}${v.toFixed(2)}%` : '—'),
+    pts: (v) => (isNum(v) ? `${v > 0 ? '+' : ''}${v.toFixed(2)} pts` : '—'),
+    int: (v) => (isNum(v) ? d3.format(',')(Math.round(v)) : '—'),
+    date: (v) => (v ? d3.utcFormat('%-d %b %Y')(d3.utcParse('%Y-%m-%d')(v)) : '—'),
+    month: (v) => (v ? d3.utcFormat('%b %Y')(d3.utcParse('%Y-%m')(v)) : '—'),
+    result: (v) => RESULT[v] ?? '—',
+  };
+  const toneClass = (v) => (v === 'win' ? 'pt-good' : v === 'lose' ? 'pt-bad' : v === 'planned' ? 'pt-warn' : '');
+  // Risk level drives colour and shape everywhere: Low = ok/circle, Medium = warn/diamond, High = bad/triangle.
+  const RISK_VAR = { Low: '--color-ok', Medium: '--color-warn', High: '--color-bad' };
+  const riskOf = (fund, funds) => (funds.find((f) => f.fund === fund) || {}).risk;
+  // Each fund gets a tint of its risk colour: within a level, lighter = steadier (funds.json is ordered low → high).
+  const fundColor = (fund, funds) => {
+    const r = riskOf(fund, funds);
+    if (!RISK_VAR[r]) return 'var(--color-fg-muted)';
+    const same = funds.filter((f) => f.risk === r), k = same.findIndex((f) => f.fund === fund);
+    const pct = same.length < 2 ? 80 : Math.round(55 + (45 * k) / (same.length - 1));
+    return `color-mix(in srgb, var(${RISK_VAR[r]}) ${pct}%, var(--color-bg))`;
+  };
+  const code = (fund, funds) => Object.assign(document.createElement('span'), {
+    className: `pt-code pt-risk-${String(riskOf(fund, funds) || '').toLowerCase()}`, textContent: fund,
+  });
+  const riskSymbol = (fund, funds) => {
+    const r = riskOf(fund, funds);
+    const type = r === 'High' ? d3.symbolTriangle : r === 'Medium' ? d3.symbolDiamond : d3.symbolCircle;
+    return { d: d3.symbol(type, r === 'Low' ? 80 : 95)(), color: RISK_VAR[r] ? `var(${RISK_VAR[r]})` : 'var(--color-fg-muted)' };
+  };
+  const pick = (rows, el) => {
+    if (!Array.isArray(rows)) return null;
+    if (el.dataset.where) {
+      const [k, v] = el.dataset.where.split('=');
+      return rows.find((r) => String(r[k]) === v) || null;
+    }
+    return rows[+el.dataset.row || 0] || null;
+  };
+  // Tooltip lives inside the chart's own drawing element.
+  const tip = (el) => {
+    const t = document.createElement('div');
+    t.className = 'pt-tip';
+    t.hidden = true;
+    el.appendChild(t);
+    return {
+      show(lines, x, y) {
+        t.replaceChildren(...lines.map((l) => Object.assign(document.createElement('span'), { textContent: l })));
+        t.hidden = false;
+        const w = t.offsetWidth, h = t.offsetHeight;
+        t.style.left = `${Math.max(0, Math.min(el.clientWidth - w, x + 12))}px`;
+        t.style.top = `${Math.max(0, y - h - 8)}px`;
+      },
+      hide() { t.hidden = true; },
+    };
+  };
+  const measure = (svg, texts) => {
+    const probe = svg.append('text');
+    const w = d3.max(texts, (s) => probe.text(s).node().getComputedTextLength()) || 0;
+    probe.remove();
+    return w;
+  };
+  const placeholder = (el, status) => { el.textContent = status === 'error' ? 'Failed to load' : '—'; };
+  return { fmt, toneClass, fundColor, code, riskSymbol, pick, tip, measure, placeholder, isNum };
+})();
+
+dash.calc('history', {
+  inputs: ['allocations', 'target', 'fund_stats'],
+  title: 'KPIs at each log entry',
+  description: 'Equity exposure and gap to target at each log entry, using the latest {{report}} before it.',
+  fn: (allocations, target, fund_stats) => {
+    const months = [...new Set(fund_stats.map((r) => r.month))].sort();
+    const reportFor = (date) => months.filter((m) => m < date.slice(0, 7)).pop() ?? months[0];
+    const mix = (weights, month) => {
+      const stats = Object.fromEntries(fund_stats.filter((r) => r.month === month).map((r) => [r.fund, r]));
+      let equity = 0;
+      for (const [fund, pct] of Object.entries(weights)) if (stats[fund]) equity += (pct * stats[fund].equity_share_pct) / 100;
+      return { equity };
+    };
+    const targetWeights = Object.fromEntries(target.map((r) => [r.fund, r.pct]));
+    const entries = [...new Set(allocations.map((r) => r.entry))].sort((a, b) => a - b);
+    const round = (v) => (v == null ? null : Math.round(v * 1000) / 1000);
+    let firstGap = null;
+    return entries.map((entry) => {
+      const rows = allocations.filter((r) => r.entry === entry);
+      const date = rows[0].date;
+      const weights = Object.fromEntries(rows.map((r) => [r.fund, r.pct]));
+      const month = reportFor(date);
+      const now = mix(weights, month), tgt = mix(targetWeights, month);
+      const funds = new Set([...Object.keys(weights), ...Object.keys(targetWeights)]);
+      const gap = [...funds].reduce((a, f) => a + Math.abs((weights[f] ?? 0) - (targetWeights[f] ?? 0)), 0) / 2;
+      if (firstGap === null) firstGap = gap;
+      return {
+        entry, date, report_month: month,
+        equity_pct: round(now.equity), equity_target_pct: round(tgt.equity),
+        gap_pct: round(gap), progress_pct: firstGap ? round(100 * (1 - gap / firstGap)) : 100,
+      };
+    });
+  },
+});
+
+dash.calc('now', {
+  inputs: ['history'],
+  title: 'KPIs now',
+  description: 'The latest log entry from the KPI history.',
+  fn: (history) => (history && history.length ? [history[history.length - 1]] : []),
+});
+
+dash.calc('market', {
+  inputs: ['macro'],
+  title: 'Latest market figures',
+  description: 'The most recent month of inflation, policy rate and {{index_name}}.',
+  fn: (macro) => [...macro].sort((a, b) => (a.month < b.month ? -1 : 1)).slice(-1),
+});
+
+dash.calc('compare', {
+  inputs: ['allocations', 'target', 'fund_stats', 'funds'],
+  title: 'Now vs target, per fund',
+  description: 'Latest log entry and target for each fund, with that fund\'s figures from the latest report.',
+  fn: (allocations, target, fund_stats, funds) => {
+    const last = Math.max(...allocations.map((r) => r.entry));
+    const now = Object.fromEntries(allocations.filter((r) => r.entry === last).map((r) => [r.fund, r.pct]));
+    const month = fund_stats.map((r) => r.month).sort().pop();
+    const stats = Object.fromEntries(fund_stats.filter((r) => r.month === month).map((r) => [r.fund, r]));
+    const plan = Object.fromEntries(target.map((r) => [r.fund, r]));
+    const round = (v) => (v == null ? null : Math.round(v * 1000) / 1000);
+    return funds
+      .filter((f) => plan[f.fund] || now[f.fund] > 0)
+      .map((f) => {
+        const s = stats[f.fund] ?? {};
+        const nowPct = now[f.fund] ?? 0, targetPct = plan[f.fund]?.pct ?? 0;
+        return {
+          fund: f.fund, name: f.name, risk: f.risk ?? null, now_pct: nowPct, target_pct: targetPct, move_pct: round(targetPct - nowPct),
+          // On target (within 0.5 pts) reads as hold, so the column never repeats a step already done
+          action: !plan[f.fund] ? 'Not in plan: sell' : targetPct > 0 && Math.abs(targetPct - nowPct) < 0.5 ? 'On target: hold' : plan[f.fund].action,
+          report_month: month,
+          month_is_annualized: !!s.month_is_annualized,
+          fytd_pct: s.fytd_pct ?? null,
+          fytd_vs_bench_pct: s.fytd_pct == null || s.fytd_bench_pct == null ? null : round(s.fytd_pct - s.fytd_bench_pct),
+          ret_1y_pct: s.ret_1y_pct ?? null, ter_pct: s.ter_pct ?? null,
+        };
+      }); // keeps funds.json order: low → high risk
+  },
+});
+
+dash.calc('bench', {
+  inputs: ['allocations', 'fund_stats', 'macro'],
+  title: 'Estimated growth and benchmarks',
+  description: 'Start = 100. Each month: your estimate (holding % × monthly return), the same money left in {{cash}}, and inflation.',
+  fn: (allocations, fund_stats, macro) => {
+    const entries = [...new Set(allocations.map((r) => r.entry))].sort((a, b) => a - b)
+      .map((e) => { const rows = allocations.filter((r) => r.entry === e); return { date: rows[0].date, rows }; });
+    if (!entries.length) return [];
+    const start = entries[0].date;
+    const out = [{ date: start, est_index: 100, cash_index: 100, cpi_index: 100 }];
+    // shortcut: a month counts in full at the allocation logged by its end, even if the entry was mid-month
+    const months = [...new Set(fund_stats.map((r) => r.month))].filter((m) => m >= start.slice(0, 7)).sort();
+    let p = 100, c = 100, i = 100, lastCpi = null;
+    const r3 = (v) => Math.round(v * 1000) / 1000;
+    for (const m of months) {
+      const lastDay = new Date(Date.UTC(+m.slice(0, 4), +m.slice(5), 0)).getUTCDate();
+      const end = `${m}-${String(lastDay).padStart(2, '0')}`;
+      const live = entries.filter((e) => e.date <= end).pop();
+      const nav = Object.fromEntries(fund_stats.filter((r) => r.month === m).map((r) => [r.fund, r.nav_change_pct]));
+      p *= 1 + live.rows.reduce((a, r) => a + (r.pct / 100) * ((nav[r.fund] ?? 0) / 100), 0);
+      c *= 1 + (nav['{{cash}}'] ?? 0) / 100;
+      lastCpi = (macro.find((r) => r.month === m) ?? {}).cpi_yoy_pct ?? lastCpi;
+      if (lastCpi != null) i *= Math.pow(1 + lastCpi / 100, 1 / 12);
+      out.push({ date: end, est_index: r3(p), cash_index: r3(c), cpi_index: r3(i) });
+    }
+    return out;
+  },
+});
+
+dash.calc('actual', {
+  inputs: ['snapshots', 'fund_stats', 'macro'],
+  title: 'Actual growth from your holdings',
+  description: 'Start = 100 at the first snapshot. Each period: your return % from your holdings screenshots (new money left out), and what {{cash}} and inflation did over the same dates.',
+  fn: (snapshots, fund_stats, macro) => {
+    const rows = [...snapshots].sort((a, b) => (a.date < b.date ? -1 : 1));
+    const latest = (list, month) => list.filter((r) => r.month <= month).sort((a, b) => (a.month < b.month ? -1 : 1)).pop();
+    const cashRows = fund_stats.filter((r) => r.fund === '{{cash}}');
+    const r3 = (v) => Math.round(v * 1000) / 1000;
+    let idx = 100, cash = 100, cpi = 100;
+    return rows.map((s, k) => {
+      if (k > 0) {
+        const days = (Date.parse(s.date) - Date.parse(rows[k - 1].date)) / 864e5, m = s.date.slice(0, 7);
+        idx *= 1 + (s.return_since_last_pct ?? 0) / 100;
+        // {{cash}} reports % a year (simple) and CPI is year-on-year: both scaled to the days between snapshots
+        cash *= 1 + ((latest(cashRows, m)?.month_return_pct ?? 0) / 100) * (days / 365);
+        cpi *= Math.pow(1 + (latest(macro, m)?.cpi_yoy_pct ?? 0) / 100, days / 365);
+      }
+      return { date: s.date, actual_index: r3(idx), cash_index: r3(cash), cpi_index: r3(cpi),
+        return_since_last_pct: k > 0 ? s.return_since_last_pct : null, new_money_pct: s.new_money_pct ?? 0 };
+    });
+  },
+});
+
+dash.calc('years', {
+  inputs: ['fund_years', 'fund_stats'],
+  title: 'Fund returns by fiscal year',
+  description: 'One row per fiscal year, newest first: this year so far from the latest report, then full-year returns with each fund\'s benchmark.',
+  fn: (fund_years, fund_stats) => {
+    const month = fund_stats.map((r) => r.month).sort().pop();
+    const FY_START = {{fy_start}}; // first month of the fiscal year; a year is named by the calendar year it ends in
+    const fy = (m) => +m.slice(0, 4) + (FY_START > 1 && +m.slice(5) >= FY_START ? 1 : 0);
+    const label = (y) => (FY_START > 1 ? `FY'${String(y).slice(2)}` : String(y));
+    const now = { fy: fy(month), month, label: `${label(fy(month))} to ${new Date(`${month}-01T00:00Z`).toLocaleString('en', { month: 'short', timeZone: 'UTC' })}`, current: true };
+    for (const s of fund_stats.filter((r) => r.month === month)) Object.assign(now, { [s.fund]: s.fytd_pct, [`${s.fund}_bm`]: s.fytd_bench_pct, [`${s.fund}_pa`]: !!s.month_is_annualized });
+    const past = {};
+    for (const r of fund_years) {
+      const row = (past[r.fy] ??= { fy: r.fy, label: label(r.fy), current: false });
+      Object.assign(row, { [r.fund]: r.return_pct, [`${r.fund}_bm`]: r.bench_pct });
+    }
+    return [now, ...Object.values(past).filter((r) => r.fy < now.fy).sort((a, b) => b.fy - a.fy)];
+  },
+});
+
+dash.calc('since', {
+  inputs: ['years'],
+  title: 'Total return from the start of each fiscal year to now',
+  description: 'Each year\'s return chained together, from {{fy_start_day}} of that year to the latest report. Money-market and income figures for the current year are converted from % a year to plain %.',
+  fn: (years) => {
+    if (!years.length) return [];
+    const cur = years[0];
+    const FY_START = {{fy_start}};
+    const fyStart = Date.UTC(cur.fy - (FY_START > 1 ? 1 : 0), FY_START - 1, 0), m = cur.month; // day before the fiscal year starts
+    const days = (Date.UTC(+m.slice(0, 4), +m.slice(5), 0) - fyStart) / 864e5;
+    // shortcut: % a year → plain % assumes simple annualizing (days/365), as money-market funds report
+    const plain = (r, k, pa) => (Number.isFinite(r[k]) ? (pa ? (r[k] * days) / 365 : r[k]) : null);
+    const funds = Object.keys(cur).filter((k) => !['fy', 'month', 'label', 'current'].includes(k) && !/_(bm|pa)$/.test(k)); // holding codes may be any string, e.g. 7203.T
+    const g = Object.fromEntries(funds.flatMap((f) => [[f, 1], [`${f}_bm`, 1]]));
+    return years.map((r, i) => {
+      const out = { fy: r.fy, label: i ? `${r.label} → now` : r.label, current: !i };
+      for (const f of funds) for (const k of [f, `${f}_bm`]) {
+        const v = plain(r, k, i === 0 && cur[`${f}_pa`]);
+        g[k] = g[k] == null || v == null ? null : g[k] * (1 + v / 100);
+        out[k] = g[k] == null ? null : Math.round((g[k] - 1) * 1e4) / 100;
+      }
+      return out;
+    });
+  },
+});
+
+dash.calc('score', {
+  inputs: ['history', 'bench', 'actual', 'log_notes'],
+  title: 'Scoreboard',
+  description: 'Each measure at the start and now, the change, the target, and whether it is winning. Growth is judged only after 12 months.',
+  fn: (history, bench, actual, log_notes) => {
+    if (!history || !history.length) return [];
+    const first = history[0], last = history[history.length - 1];
+    const hasActual = !!(actual && actual.length > 1);
+    // Once two snapshots exist, growth and both comparisons run over the snapshot dates; before that, the estimate.
+    const end = hasActual ? actual[actual.length - 1]
+      : bench && bench.length ? { ...bench[bench.length - 1], actual_index: bench[bench.length - 1].est_index } : null;
+    const startDate = hasActual ? actual[0].date : bench && bench.length ? bench[0].date : null;
+    const growth = end ? end.actual_index - 100 : 0;
+    const vsCash = end ? growth - (end.cash_index - 100) : 0, vsCpi = end ? growth - (end.cpi_index - 100) : 0;
+    const months = end && startDate ? Math.floor((Date.parse(end.date) - Date.parse(startDate)) / (864e5 * 30.44)) : 0;
+    const planned = !!(log_notes.find((n) => n.entry === last.entry) || {}).planned;
+    const r3 = (v) => (v == null ? null : Math.round(v * 1000) / 1000);
+    const res = (d, eps = 0.005) => (d == null ? 'info' : d > eps ? 'win' : d < -eps ? 'lose' : 'even');
+    // Shares swing about ±3 points a month against cash at the target mix: no verdict before 12 months, then only beyond ±1 point.
+    const judged = (d) => (months < 12 ? 'early' : res(d, 1));
+    const row = (key, metric, unit, start, now, target, result, basis) =>
+      ({ key, metric, unit, start: r3(start), now: r3(now), change: start == null || now == null ? null : r3(now - start), target: r3(target), result, basis: basis ?? null });
+    // A planned step back (e.g. consolidating before a split) reads as Planned, not Lose.
+    const pl = (r) => (planned && r === 'lose' ? 'planned' : r);
+    const span = `${months} of 12 months`;
+    return [
+      row('growth', 'Growth since start', 'pct', 0, growth, null, judged(growth), `${hasActual ? 'your holdings' : '{{fund}} prices (estimate)'} · ${span}`),
+      row('vs_cash', 'vs leaving it all in {{cash}}', 'pct', 0, vsCash, null, judged(vsCash), span),
+      row('vs_cpi', 'vs inflation', 'pct', 0, vsCpi, null, judged(vsCpi), span),
+      row('equity', 'Equity exposure', 'pct', first.equity_pct, last.equity_pct, last.equity_target_pct,
+        pl(res(Math.abs(first.equity_pct - last.equity_target_pct) - Math.abs(last.equity_pct - last.equity_target_pct)))),
+      row('progress', 'Moved toward target', 'pct', first.progress_pct, last.progress_pct, 100,
+        pl(res(last.progress_pct - first.progress_pct, 0.05))),
+    ];
+  },
+});
+
+dash.calc('next', {
+  inputs: ['log_notes'],
+  title: 'Next step',
+  description: 'The next step written with the latest log entry.',
+  fn: (log_notes) => {
+    const n = [...log_notes].sort((a, b) => a.entry - b.entry).pop();
+    return n ? [{ entry: n.entry, next: n.next ?? null }] : [];
+  },
+});
+</script>
+
+<script>
+// Legend swatches and empty-state notes: attribute-only writes outside drawings.
+dash.onData(() => {
+  document.querySelectorAll('.pt [data-sw]').forEach((sw) => {
+    sw.style.background = dash.colors[+sw.dataset.sw % dash.colors.length];
+  });
+  document.querySelectorAll('.pt [data-sw-line]').forEach((sw) => {
+    sw.style.borderColor = dash.colors[+sw.dataset.swLine % dash.colors.length];
+  });
+  const b = dash.data('bench'), a = dash.data('actual');
+  const growthWaiting = b.status === 'ok' && b.data.length < 2 && !(a.status === 'ok' && a.data.length > 1);
+  document.querySelectorAll('.pt [data-growth-state]').forEach((p) => { p.hidden = (p.dataset.growthState === 'waiting') !== growthWaiting; });
+});
+
+dash.draw('val', (el) => {
+  const d = dash.data(el.dataset.source);
+  const row = d.status === 'ok' ? PT.pick(d.data, el) : null;
+  const v = row ? row[el.dataset.field] : null;
+  el.textContent = row ? (PT.fmt[el.dataset.fmt] || ((x) => (x == null ? '—' : String(x))))(v) : '—';
+  if (el.dataset.tone === 'sign') {
+    el.classList.toggle('pt-good', PT.isNum(v) && v > 0.005);
+    el.classList.toggle('pt-bad', PT.isNum(v) && v < -0.005);
+  }
+  if (el.dataset.tone === 'judged') {
+    el.classList.remove('pt-good', 'pt-bad', 'pt-warn');
+    const cls = PT.toneClass(row && row.result);
+    if (cls) el.classList.add(cls);
+  }
+  if (el.dataset.tone === 'result') {
+    el.classList.remove('pt-good', 'pt-bad', 'pt-warn');
+    const cls = PT.toneClass(v);
+    if (cls) el.classList.add(cls);
+  }
+});
+
+dash.draw('growth', (el) => {
+  const b = dash.data('bench'), a = dash.data('actual');
+  if (b.status !== 'ok' || !b.data.length) return PT.placeholder(el, b.status);
+  el.replaceChildren();
+  const parse = d3.utcParse('%Y-%m-%d');
+  const act = a.status === 'ok' ? a.data : [];
+  // Two snapshots or more: all lines over the snapshot dates. Before that: the estimate from fund prices.
+  const useActual = act.length > 1;
+  const rows = (useActual ? act : b.data).map((r) => ({ ...r, d: parse(r.date) }));
+  const W = Math.max(280, el.clientWidth || 600), H = 220;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', 'Growth index from 100: your portfolio, money left in {{cash}}, and inflation');
+  const n = dash.colors.length;
+  const series = [
+    useActual ? { key: 'actual_index', color: dash.colors[0], label: 'You', strong: true }
+      : { key: 'est_index', color: dash.colors[0], dash: '5 4', label: 'You (est.)' },
+    { key: 'cash_index', color: dash.colors[1 % n], label: '{{cash}}' },
+    { key: 'cpi_index', color: dash.colors[2 % n], label: 'Inflation' },
+  ];
+  const vals = rows.flatMap((r) => series.map((s) => r[s.key]));
+  const y = d3.scaleLinear([Math.min(99, d3.min(vals) - 0.5), Math.max(101, d3.max(vals) + 0.5)], [H - 24, 8]).nice();
+  const yTicks = y.ticks(4), yFmt = y.tickFormat(4);
+  const left = PT.measure(svg, yTicks.map(yFmt)) + 10;
+  const lastRow = rows[rows.length - 1];
+  const endText = (s) => `${s.label} ${lastRow[s.key].toFixed(1)}`;
+  const right = PT.measure(svg, series.map(endText)) + 12;
+  const x0 = rows[0].d, x1 = lastRow.d;
+  const x = d3.scaleUtc([x0, +x1 > +x0 ? x1 : d3.utcMonth.offset(x0, 1)], [left, W - right]);
+  svg.append('g').attr('class', 'pt-grid').attr('transform', `translate(${left},0)`)
+    .call(d3.axisLeft(y).tickValues(yTicks).tickFormat(yFmt).tickSize(-(W - left - right))).call((g) => g.select('.domain').remove());
+  svg.append('g').attr('transform', `translate(0,${H - 24})`)
+    .call(d3.axisBottom(x).ticks(d3.utcMonth.every(Math.ceil((d3.utcMonth.count(x0, x1) || 1) / Math.max(2, Math.floor((W - left - right) / 90))))).tickFormat(d3.utcFormat('%b %Y')));
+  for (const s of series) {
+    svg.append('path').datum(rows).attr('fill', 'none').attr('stroke-width', s.strong ? 2.5 : 1.75)
+      .attr('stroke-dasharray', s.dash || null).style('stroke', s.color)
+      .attr('d', d3.line().x((r) => x(r.d)).y((r) => y(r[s.key])));
+    svg.selectAll(null).data(rows).join('circle').attr('r', s.strong ? 3.5 : 2.5)
+      .attr('cx', (r) => x(r.d)).attr('cy', (r) => y(r[s.key])).style('fill', s.color);
+  }
+  // End labels, nudged apart so they never overlap.
+  const placed = series.map((s) => ({ s, y: y(lastRow[s.key]) + 4 })).sort((p, q) => p.y - q.y);
+  for (let k = 1; k < placed.length; k++) if (placed[k].y - placed[k - 1].y < 14) placed[k].y = placed[k - 1].y + 14;
+  for (const e of placed) svg.append('text').attr('class', e.s.strong ? 'pt-strong' : null).attr('x', x(lastRow.d) + 8).attr('y', e.y).text(endText(e.s));
+  const tt = PT.tip(el);
+  svg.append('rect').attr('x', left).attr('y', 0).attr('width', W - left - right).attr('height', H).attr('fill', 'transparent')
+    .on('pointermove', (ev) => {
+      const [px, py] = d3.pointer(ev, el);
+      const r = rows.reduce((p, q) => (Math.abs(x(q.d) - px) < Math.abs(x(p.d) - px) ? q : p));
+      tt.show([PT.fmt.date(r.date), ...series.map((s) => `${s.label} ${r[s.key].toFixed(2)}`)], px, py);
+    })
+    .on('pointerleave', () => tt.hide());
+});
+
+dash.draw('years', (tbody) => {
+  const y = dash.data(tbody.closest('table').dataset.source);
+  tbody.replaceChildren();
+  if (y.status !== 'ok') return;
+  const funds = [...tbody.closest('table').querySelectorAll('thead th')].slice(1).map((th) => th.dataset.field);
+  const p = (v) => `${v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}%`;
+  // Two questions kept apart: the value is green for a gain, red for a loss; the small line says whether the fund beat its benchmark (▲) or fell short (▼).
+  for (const r of y.data) {
+    const tr = tbody.insertRow();
+    tr.dataset.key = String(r.fy);
+    if (r.current) tr.className = 'pt-now';
+    const first = tr.insertCell();
+    first.textContent = r.label;
+    first.className = 'pt-fund';
+    for (const f of funds) {
+      const td = tr.insertCell(), v = r[f], bm = r[`${f}_bm`];
+      if (!PT.isNum(v)) { td.textContent = '—'; continue; }
+      td.textContent = `${p(v)}${r[`${f}_pa`] ? ' /yr' : ''}`;
+      td.className = v > 0 ? 'pt-good' : v < 0 ? 'pt-bad' : '';
+      if (PT.isNum(bm)) {
+        const mark = v > bm ? '▲ ' : v < bm ? '▼ ' : '';
+        td.appendChild(Object.assign(document.createElement('small'), {
+          textContent: `${mark}bm ${p(bm)}`, className: v > bm ? 'pt-up' : v < bm ? 'pt-down' : '',
+        }));
+      }
+    }
+  }
+});
+
+dash.draw('mix', (el) => {
+  const c = dash.data('compare'), fd = dash.data('funds');
+  if (c.status !== 'ok' || !c.data.length) return PT.placeholder(el, c.status);
+  el.replaceChildren();
+  const rows = c.data, funds = fd.status === 'ok' ? fd.data : [];
+  const W = Math.max(280, el.clientWidth || 600);
+  const rowH = 36, top = 4, bottom = 24, mark = 18;
+  const H = top + rows.length * rowH + bottom;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', 'Each {{fund}}: percentage now and target percentage');
+  const endText = (r) => `${PT.fmt.pct(r.now_pct)} → ${PT.fmt.pct(r.target_pct)}`;
+  const left = mark + PT.measure(svg, rows.map((r) => r.fund)) + 10;
+  const right = PT.measure(svg, rows.map(endText)) + 12;
+  const x = d3.scaleLinear([0, Math.max(10, d3.max(rows, (r) => Math.max(r.now_pct, r.target_pct)))], [left, W - right]).nice();
+  svg.append('g').attr('class', 'pt-grid').attr('transform', `translate(0,${H - bottom})`)
+    .call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left - right) / 80))).tickFormat((v) => `${v}%`).tickSize(-(H - top - bottom)))
+    .call((g) => g.select('.domain').remove());
+  const tt = PT.tip(el);
+  const g = svg.selectAll('g.pt-row').data(rows).join('g').attr('class', 'pt-row')
+    .attr('transform', (r, i) => `translate(0,${top + i * rowH})`);
+  g.append('rect').attr('x', 0).attr('width', W).attr('height', rowH).attr('fill', 'transparent');
+  g.append('path').attr('transform', `translate(6,${rowH / 2})`)
+    .attr('d', (r) => PT.riskSymbol(r.fund, funds).d).style('fill', (r) => PT.riskSymbol(r.fund, funds).color);
+  g.append('text').attr('class', 'pt-strong').attr('x', mark).attr('y', rowH / 2 + 4).text((r) => r.fund);
+  g.append('rect').attr('x', left).attr('y', 7).attr('height', 10).attr('rx', 2)
+    .attr('width', (r) => Math.max(r.now_pct > 0 ? 1.5 : 0, x(r.now_pct) - left)).style('fill', dash.colors[1 % dash.colors.length]);
+  g.append('rect').attr('x', left).attr('y', 19).attr('height', 10).attr('rx', 2)
+    .attr('width', (r) => Math.max(0, x(r.target_pct) - left)).style('fill', dash.colors[0]);
+  g.append('text').attr('class', 'pt-strong').attr('x', W).attr('text-anchor', 'end').attr('y', rowH / 2 + 4).text(endText);
+  g.on('pointermove', (ev, r) => {
+    const [px, py] = d3.pointer(ev, el);
+    tt.show([r.name, `Risk: ${r.risk ?? '—'}`, `Now ${PT.fmt.pct(r.now_pct)} · Target ${PT.fmt.pct(r.target_pct)}`, `Move ${r.move_pct > 0 ? '+' : ''}${r.move_pct.toFixed(1)} pts`, r.action], px, py);
+  }).on('pointerleave', () => tt.hide());
+});
+
+dash.draw('plan', (tbody) => {
+  const c = dash.data('compare'), fd = dash.data('funds');
+  tbody.replaceChildren();
+  if (c.status !== 'ok') return;
+  const f = PT.fmt, funds = fd.status === 'ok' ? fd.data : [];
+  for (const r of c.data) {
+    const tr = tbody.insertRow();
+    tr.dataset.key = r.fund;
+    const cell = (text, cls) => { const td = tr.insertCell(); td.textContent = text; if (cls) td.className = cls; return td; };
+    const fc = tr.insertCell();
+    fc.title = r.name;
+    fc.appendChild(PT.code(r.fund, funds));
+    cell(f.pct(r.now_pct));
+    cell(f.pct(r.target_pct));
+    cell(r.action, 'pt-text');
+  }
+});
+
+dash.draw('legend', (ul) => {
+  const f = dash.data('funds');
+  ul.replaceChildren();
+  if (f.status !== 'ok') return;
+  for (const fund of f.data) {
+    const li = document.createElement('li');
+    const sw = document.createElement('span');
+    sw.className = 'pt-sw';
+    sw.style.background = PT.fundColor(fund.fund, f.data);
+    li.append(sw, PT.code(fund.fund, f.data));
+    ul.appendChild(li);
+  }
+});
+
+dash.draw('stack', (el) => {
+  const a = dash.data('allocations'), t = dash.data('target'), f = dash.data('funds');
+  const bad = [a, t, f].find((d) => d.status !== 'ok');
+  if (bad) return PT.placeholder(el, bad.status);
+  el.replaceChildren();
+  const funds = f.data;
+  const order = (fund) => { const i = funds.findIndex((x) => x.fund === fund); return i < 0 ? 99 : i; };
+  const entries = [...new Set(a.data.map((r) => r.entry))].sort((p, q) => p - q);
+  const bars = entries.map((e) => {
+    const rows = a.data.filter((r) => r.entry === e);
+    return { label: `#${e} · ${d3.utcFormat('%-d %b %y')(d3.utcParse('%Y-%m-%d')(rows[0].date))}`, parts: rows };
+  });
+  bars.push({ label: 'Target', parts: t.data.filter((r) => r.pct > 0) });
+  const W = Math.max(280, el.clientWidth || 600), rowH = 34, H = bars.length * rowH + 4;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('role', 'img').attr('aria-label', '{{Fund}} mix at each log entry and at target, as 100% bars');
+  const left = PT.measure(svg, bars.map((b) => b.label)) + 12;
+  const x = d3.scaleLinear([0, 100], [left, W]);
+  const tt = PT.tip(el);
+  bars.forEach((b, i) => {
+    const yb = i * rowH + 4;
+    svg.append('text').attr('class', b.label === 'Target' ? 'pt-strong' : null).attr('x', 0).attr('y', yb + 17).text(b.label);
+    let acc = 0;
+    for (const p of [...b.parts].sort((m, n) => order(m.fund) - order(n.fund))) {
+      const x0 = x(acc), w = Math.max(0.5, x(acc + p.pct) - x0);
+      acc += p.pct;
+      const name = (funds.find((z) => z.fund === p.fund) || {}).name || p.fund;
+      svg.append('rect').attr('x', x0).attr('y', yb).attr('width', w).attr('height', 24)
+        .style('fill', PT.fundColor(p.fund, funds)).style('stroke', 'var(--color-bg)').style('stroke-width', 1)
+        .on('pointermove', (ev) => { const [px, py] = d3.pointer(ev, el); tt.show([`${p.fund} · ${PT.fmt.pct(p.pct)}`, name, `Risk: ${(funds.find((z) => z.fund === p.fund) || {}).risk ?? '—'}`, b.label], px, py); })
+        .on('pointerleave', () => tt.hide());
+      const lab = `${p.fund} ${Math.round(p.pct)}%`;
+      if (w > PT.measure(svg, [lab]) + 10) svg.append('text').attr('x', x0 + 5).attr('y', yb + 16).style('fill', 'var(--color-fg)').style('pointer-events', 'none').text(lab);
+    }
+  });
+});
+
+dash.draw('log', (tbody) => {
+  const n = dash.data('log_notes'), h = dash.data('history');
+  tbody.replaceChildren();
+  if (n.status !== 'ok') return;
+  const kpi = Object.fromEntries((h.status === 'ok' && h.data ? h.data : []).map((r) => [r.entry, r]));
+  for (const r of [...n.data].sort((p, q) => q.entry - p.entry)) {
+    const k = kpi[r.entry] || {};
+    const tr = tbody.insertRow();
+    tr.dataset.key = String(r.entry);
+    const cell = (text, cls) => { const td = tr.insertCell(); td.textContent = text; if (cls) td.className = cls; return td; };
+    cell(String(r.entry));
+    cell(PT.fmt.date(r.date));
+    cell(PT.fmt.pct(k.equity_pct));
+    cell(PT.fmt.pct0(k.progress_pct));
+    cell(r.rationale, 'pt-text');
+    cell(r.verdict, 'pt-text');
+  }
+});
+</script>
