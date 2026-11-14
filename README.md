@@ -55,16 +55,20 @@ mkdir -p ~/Documents/Portfolios/family-isa && cd ~/Documents/Portfolios/family-i
 Set up a portfolio tracker for this account.
 ```
 
-Claude asks once, in one message, for what it needs:
+New to investing? Say that instead, e.g. *"I want to start investing, I live in the UK"*.
 
-| It asks for | For example |
+Claude asks a few plain questions in one message. Skip any of them or say "not sure"; it fills in sensible defaults and tells you which it used.
+
+| It asks | For example |
 |---|---|
-| Account name, currency, country | "Family ISA", GBP, UK |
-| Holdings with today's % or amounts | VWRL 60%, IGLT 25%, cash 15%, or a screenshot from your app |
-| Target mix, plan and horizon | VWRL 75 / IGLT 20 / cash 5, growth, 10+ years |
-| Cash holding and benchmark | a money-market fund; a broad index ETF |
-| A flat tax rate on gains | 0.20 (an estimate only) |
-| How to track amounts | percentages only, amounts kept local, or local plus totals on the dashboard |
+| Where you live, or the currency | UK, or GBP |
+| Whether you already invest, and in what | "VWRL 60%, IGLT 40%", a screenshot from your app, or "nothing yet" |
+| What the money is for, and when you might need it | "a house deposit in 8 years" |
+| How you'd react to a 20% drop | hold on, worry, or sell |
+| Any rules or ideas | Shariah-compliant only, or "I keep hearing about Nvidia" |
+| Amounts, or percentages only | percentages only shares nothing about how much you have |
+
+If you have no plan yet, it recommends a starting mix that you can buy in your country, with the evidence for each pick, and checks any stocks you mentioned. You accept it or change it. It also lists the technical settings (the cash holding, the benchmark, a tax rate for estimates) with a default for each. Accept them, change them, or ask what any of them means.
 
 Then it creates the folder's files (git, a gitignored `private/` folder, a commit guard), checks each ticker, loads price history and builds the page.
 

@@ -1,6 +1,6 @@
 ---
 name: portfolio-tracker
-description: "Tracks one investment account in one currency with any holdings (mutual funds, stocks, ETFs). Keeps a portfolio log and target mix, fetches monthly figures, gives rules-based next steps (target mix, drift, buying in steps), recommends specific holdings only when asked, estimates tax with a disclaimer, and builds a claude.ai dashboard that is published only on request. Amounts stay in a local gitignored private/ folder; everything else is percentages. Triggers: /portfolio-tracker, set up a portfolio tracker, track my portfolio, new allocation, holdings screenshot, rebalance, new monthly figures, update the tracker, publish the dashboard."
+description: "Tracks one investment account in one currency with any holdings (mutual funds, stocks, ETFs). Keeps a portfolio log and target mix, fetches monthly figures, gives rules-based next steps (target mix, drift, buying in steps), recommends specific holdings only when asked, estimates tax with a disclaimer, and builds a claude.ai dashboard that is published only on request. Amounts stay in a local gitignored private/ folder; everything else is percentages. Works for complete beginners: asks in plain words and recommends a starting mix. Triggers: /portfolio-tracker, set up a portfolio tracker, start investing, help me invest, what should I invest in, track my portfolio, new allocation, holdings screenshot, rebalance, new monthly figures, update the tracker, publish the dashboard."
 ---
 
 # Portfolio tracker
@@ -60,12 +60,34 @@ Its job is to answer "am I doing well, and what next?". Page order: summary line
 
 ## Set up a new account
 
-1. Ask once, in one message, for everything: account name, currency, country, the holdings (any tickers or funds) with current % or amounts, the target % per holding, the cash holding, the benchmark, plan and horizon, a flat tax rate on gains (an estimate), and how to track: percentages only, or amounts too (kept local, or local plus totals on the dashboard). Say this can be changed later. Pick the source from the holdings. Offer defaults to accept, from the country file if there is one (e.g. a T-bill ETF as cash, a broad-market ETF as benchmark).
-2. Create the folder with `git init`, a `.gitignore` holding `private/` and `*.env`, `mkdir -m 700 private`, and the hook: `ln -sf $S/pre-commit .git/hooks/pre-commit`. Write `portfolio.json`, and a short `CLAUDE.md` saying the folder is an account of this skill, with the rules above and any account facts the user gives.
-3. For `prices`, run `prices.py resolve` on the holdings, the cash holding and the benchmark (`references/sources/prices.md`); it lists what it can't settle. Ask the user about those.
-4. Write `portfolio.json` `amounts` from that answer, then `data/funds.json` (from the resolver's draft rows), `data/allocations.json` (entry 1), `data/target.json`, `data/log_notes.json`, `data/snapshots.json` (first row `return_since_last_pct: null`) and log entry #01 in `log.md`. If the user chose amounts and gave them, write them to `private/holdings.csv` (`chmod 600`), compute each holding's % from it, and store only the %. With `"none"`, use any amounts given only to compute the %, and keep nothing.
-5. Load the figures as the source file says, then `build_page.py`, then `check_calcs.js`.
-6. Create the dashboard only when the user says "publish": `references/publishing.md`, "First publish".
+The user may know nothing about investing. Ask in plain words, never block on a missing answer, and pick everything technical yourself.
+
+1. **Ask once, in one short message, in everyday language.** Every question can be skipped ("skip" or "not sure" is a fine answer); say so.
+   - Which country do you live in, or which currency is the money in?
+   - Do you already invest? If yes: what you hold (names, tickers, or a screenshot from your app) and roughly how much of each, as % or amounts. If no, say so.
+   - What is the money for, and when might you need it?
+   - If it dropped 20% in a bad year, would you hold on, worry, or sell?
+   - Any rules or ideas: e.g. Shariah-compliant only, companies to avoid, or stocks you've heard about and want considered.
+   - Track amounts too, or percentages only? (Percentages only shares nothing about how much you have.)
+   Then, in the same message, the technical settings, each with the default you'd use (step 2): cash holding, benchmark, a flat tax rate on gains, and the target mix if they already invest. They can accept, change, or ask what any of them means. Explain any term asked about in one or two plain sentences, then carry on.
+2. **Fill every gap with a default, then say which.** After setup, one short list of the defaults used, and that any can be changed by saying so.
+   | Not given | Default |
+   |---|---|
+   | Account name | "My portfolio" |
+   | Country / currency | Ask once more in one line; still unknown → `us`, USD, and say so |
+   | Purpose / horizon | "balanced, 5+ years" |
+   | Reaction to a 20% drop | hold on → growth; worry or unknown → balanced; sell → cautious (more cash and bonds) |
+   | Cash holding, benchmark, `fy_start`, `fred`, `app` | From the country file; with none, a money-market or T-bill fund and a broad local-market index ETF priced in the account's currency (checked with `prices.py resolve`), `fy_start` 1, no `fred` (inflation by hand: `references/sources/prices.md`), `app` "your broker app" |
+   | `tax_rate_on_gains` | Leave it out (`money.py` shows tax as 0 with a note); give the country file's figure, if any, as an estimate |
+   | Amounts | `"none"` |
+   | Target mix | Recommend one (step 3) |
+   Pick the source from the holdings.
+3. **No target yet, or no holdings at all:** setting up counts as asking, so recommend a target mix per `references/recommending.md`, using the country, purpose, horizon, risk answer and rules. Every holding must be buyable in the account's currency (`prices.py resolve`). For each stock the user named, show the same evidence and either include it as a small capped share (5–10% each) or say plainly why not. Ask the user to accept or change the mix. With no holdings, log entry #01 as 100% in the cash holding (money not yet invested) and make the first monthly step the `next` step.
+4. Create the folder with `git init`, a `.gitignore` holding `private/` and `*.env`, `mkdir -m 700 private`, and the hook: `ln -sf $S/pre-commit .git/hooks/pre-commit`. Write `portfolio.json`, and a short `CLAUDE.md` saying the folder is an account of this skill, with the rules above and any account facts the user gives.
+5. For `prices`, run `prices.py resolve` on the holdings, the cash holding and the benchmark (`references/sources/prices.md`); it lists what it can't settle. Ask the user about those in plain words, or settle them yourself (e.g. pick the listing in the account's currency) and say what you chose.
+6. Write `portfolio.json` `amounts` from that answer, then `data/funds.json` (from the resolver's draft rows), `data/allocations.json` (entry 1), `data/target.json`, `data/log_notes.json`, `data/snapshots.json` (first row `return_since_last_pct: null`) and log entry #01 in `log.md`. If the user chose amounts and gave them, write them to `private/holdings.csv` (`chmod 600`), compute each holding's % from it, and store only the %. With `"none"`, use any amounts given only to compute the %, and keep nothing.
+7. Load the figures as the source file says, then `build_page.py`, then `check_calcs.js`.
+8. Create the dashboard only when the user says "publish": `references/publishing.md`, "First publish".
 
 **New source or country:** `references/adding-a-source.md`, `references/adding-a-country.md`.
 
