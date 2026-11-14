@@ -1,6 +1,6 @@
 ---
 name: portfolio-tracker
-description: Tracks one investment account in one currency with any holdings (mutual funds, stocks, ETFs). Keeps a portfolio log and target mix, fetches monthly figures, gives rules-based next steps (target mix, drift, buying in steps), recommends specific holdings only when asked, estimates tax with a disclaimer, and builds a claude.ai dashboard that is published only on request. Amounts stay in a local gitignored private/ folder; everything else is percentages. Triggers: /portfolio-tracker, set up a portfolio tracker, track my portfolio, new allocation, holdings screenshot, rebalance, new monthly figures, update the tracker, publish the dashboard.
+description: "Tracks one investment account in one currency with any holdings (mutual funds, stocks, ETFs). Keeps a portfolio log and target mix, fetches monthly figures, gives rules-based next steps (target mix, drift, buying in steps), recommends specific holdings only when asked, estimates tax with a disclaimer, and builds a claude.ai dashboard that is published only on request. Amounts stay in a local gitignored private/ folder; everything else is percentages. Triggers: /portfolio-tracker, set up a portfolio tracker, track my portfolio, new allocation, holdings screenshot, rebalance, new monthly figures, update the tracker, publish the dashboard."
 ---
 
 # Portfolio tracker
@@ -69,7 +69,7 @@ Its job is to answer "am I doing well, and what next?". Page order: summary line
 
 **New source or country:** `references/adding-a-source.md`, `references/adding-a-country.md`.
 
-**Worked example:** `examples/us-sample/` is a made-up US account (`prices` source) with every file filled in; its numbers are invented, not anyone's holdings.
+**Worked example:** `examples/us-sample/` is a made-up US account (`prices` source) with every file filled in; its allocations are made up, not anyone's holdings; its market figures are real.
 
 ## When the user reports a new allocation
 

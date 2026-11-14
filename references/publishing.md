@@ -27,7 +27,7 @@ Only when the user says "publish". The account folder is the master; the dashboa
 The page's "Your money" block (total value, gain to date, money added since, what 1 point is worth) stays hidden unless an `amounts` dataset exists. Its file lives only in `private/`, so it never reaches git:
 1. `python3 -I $S/money.py page` writes `private/amounts.json` (one row, chmod 600).
 2. Upload it as above and `set` (first time) or `update` `datasets/amounts` with the new `source.url`; delete the old blob.
-3. Record only `"amounts": {"file": "private/amounts.json", "blob": <id>}` in `data/published.json`: no sha256, because that file is committed. Re-upload on every publish after a holdings screenshot or deposit.
+3. Record only `"amounts": {"file": "private/amounts.json", "blob": <id>}` in `data/published.json`: no sha256, because that file is never committed. Re-upload on every publish after a holdings screenshot or deposit.
 
 Anyone the artifact is shared with sees these amounts; say so once when the user first chooses "dashboard". If `amounts` is no longer "dashboard" but `published.json` still lists `amounts`, delete the `datasets/amounts` document and its blob and drop the entry.
 

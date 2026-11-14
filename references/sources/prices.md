@@ -1,7 +1,7 @@
 # Source: prices (anything with a ticker)
 
 Script: `prices.py`. For stocks, ETFs and listed funds. Risk is measured from price swings.
-`portfolio.json` needs `cash` (e.g. a T-bill ETF such as SGOV), `index` with a `symbol` (the benchmark of every non-cash holding, e.g. SPY), and `fred` (the country's CPI and policy-rate series, named in its country file). Each `data/funds.json` row needs `equity_share_pct` (100 for a stock or stock fund, 0 for cash or bonds).
+`portfolio.json` needs `cash` (e.g. a T-bill ETF such as SGOV), `index` with a `symbol` (the benchmark of every non-cash holding, e.g. SPY), and `fred` (the country's CPI and policy-rate series, named in its country file). If FRED has no series for the country, leave `fred` out: `fetch` still works, but `macro` cannot run, so write each month's macro row by hand from the official release. Each `data/funds.json` row needs `equity_share_pct` (100 for a stock or stock fund, 0 for cash or bonds).
 
 ## Checking new tickers (setup, or a holding added later)
 

@@ -140,7 +140,7 @@ def fetch(account, cfg, funds, dl):
         if not body.startswith(b"observation_date,"):
             sys.exit(f"prices: FRED gave no CSV for {sid}. Reply starts: {body[:120]!r}")
         open(os.path.join(dl, f"fred_{sid}.csv"), "wb").write(body)
-    print(f"saved {len(funds) + 1} price series and {len(cfg['fred'])} FRED series to {dl}")
+    print(f"saved {len(funds) + 1} price series and {len(cfg.get('fred', {}))} FRED series to {dl}")
 
 
 def month_ends(dl, sym):

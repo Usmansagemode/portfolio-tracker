@@ -16,7 +16,7 @@ A source must produce, as JSON on stdout (schemas in `references/files.md`):
 ## Checklist
 
 1. `scripts/<source>.py` (snake_case of the source name). It stops with a clear message when a reply isn't the expected data (layout change, bot check, error JSON) and never writes a guessed number.
-2. A self-check in its `__main__`: an assert on a small fixture (a saved snippet or a made-up series) that runs on every call, like `prices.py` and `ubl_fmr.py`.
+2. A self-check in its `__main__`: an assert on a small fixture (a saved snippet or a made-up series) that runs on every call, like `prices.py`. At minimum, assert the output is sane, like `ubl_fmr.py`.
 3. `references/sources/<source>.md`: URL pattern, quirks, the monthly refresh steps, and what each field means for this source. Facts about one fund company stay here, never in a country file.
 4. A block named `<source>` in `templates/text.json` with the same keys as the others (page wording: "fund" or "holding", how risk is rated, what the benchmark is).
 5. List it under "Source and country" in `SKILL.md`.

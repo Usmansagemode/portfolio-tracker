@@ -12,7 +12,10 @@ and builds a private claude.ai dashboard that answers *"am I doing well, and wha
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/dashboard-dark.png">
   <img alt="Dashboard for the sample account: progress to target, next step, three growth tiles and a to-do table" src="docs/images/dashboard-light.png">
 </picture>
-<p align="center"><sub>The bundled sample account (<code>examples/us-sample/</code>). Every number is invented.</sub></p>
+<p align="center"><sub>The bundled sample account (<code>examples/us-sample/</code>). The allocations are made up; the market figures are real.</sub></p>
+
+> [!IMPORTANT]
+> Not financial or tax advice. The skill follows rules you agree with it; you decide what to do with your money.
 
 ## Features
 
@@ -25,7 +28,8 @@ and builds a private claude.ai dashboard that answers *"am I doing well, and wha
 
 ## Requirements
 
-- [Claude Code](https://claude.com/claude-code) signed in to a claude.ai account (the dashboard is a claude.ai artifact)
+- [Claude Code](https://claude.com/claude-code)
+- For the dashboard only: Claude Code signed in to a claude.ai account with artifacts enabled. Tracking, updates and advice work without it.
 - Python 3 and Node.js
 - Git
 
@@ -115,7 +119,7 @@ Every section has a **?** button that says what it shows and how to read it. Hol
 | `private/` (gitignored, owner-only) | Amounts from screenshots and deposits, if you chose to keep them. Optional API keys. |
 | The claude.ai dashboard | Percentages. Totals (value, gain, 1 point) only if you chose "dashboard". |
 
-A pre-commit hook refuses to commit `private/`, `.env` files or currency amounts. Amounts appear in chat only when you ask.
+A pre-commit hook refuses to commit `private/`, `.env` files, or anything that looks like an amount: digits after the account's currency symbol or code (`$5000` or `USD 5000` in a US account) or with two or more thousands separators (`12,345,678`). A bare number like `5000` gets through, so keep amounts out of the log by habit too. Amounts appear in chat only when you ask.
 
 ## Data sources
 
@@ -124,7 +128,7 @@ A pre-commit hook refuses to commit `private/`, `.env` files or currency amounts
 | `prices` | Anything with a ticker | Free Yahoo prices and FRED inflation and rates; an optional Alpha Vantage key. These are unofficial and can change without notice. |
 | `ubl-fmr` | UBL / Al-Ameen funds, Pakistan | UBL's monthly fund report |
 
-Country notes (inflation, trading, tax) exist for the US and Pakistan; other countries work without one. To add your own: [`references/adding-a-source.md`](references/adding-a-source.md), [`references/adding-a-country.md`](references/adding-a-country.md).
+Country notes (inflation, trading, tax) exist for the US and Pakistan; other countries work without one. Outside the US, inflation updates automatically only if FRED carries your country's series; otherwise the monthly inflation figure is entered by hand from the official release. To add your own: [`references/adding-a-source.md`](references/adding-a-source.md), [`references/adding-a-country.md`](references/adding-a-country.md).
 
 ## How it works
 

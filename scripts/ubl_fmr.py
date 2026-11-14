@@ -3,7 +3,7 @@
 Usage: python3 -I ubl_fmr.py <saved FMR html> <YYYY-MM>          (fund_stats rows)
        python3 -I ubl_fmr.py --years <saved FMR html>         (fund_years rows)
 Download first:  curl -sSL -A "Mozilla/5.0" "https://online.ublfunds.com/FMR/Funds/Islamic?Year=2026&Mon=Oct" -o fmr.html
-AIRSF is tracked as its Equity Sub-Fund (ESF), the sub-fund the 5+ year plan uses.
+AIRSF is tracked as its Equity Sub-Fund (ESF) only.
 """
 import html, json, re, sys
 
@@ -107,6 +107,8 @@ def years(t):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        sys.exit(__doc__)
     if sys.argv[1] == "--years":  # python3 -I ubl_fmr.py --years <saved html>  -> fund_years rows
         json.dump(years(text_of(sys.argv[2])), sys.stdout, indent=1)
         sys.exit()

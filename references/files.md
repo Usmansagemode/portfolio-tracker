@@ -4,11 +4,11 @@
 
 | Key | Example (UBL / US) | Used by |
 |---|---|---|
-| `name` | "Al-Ameen Portfolio Tracker" | page title, artifact title |
+| `name` | "Islamic Funds Tracker" | page title, artifact title |
 | `source` | "ubl-fmr" / "prices" | how the numbers arrive: `references/sources/<source>.md`, its script, page wording (`templates/text.json`) |
 | `country` | "pk" / "us" | where the account is held: `references/countries/<country>.md` (currency, inflation, trading, tax) |
 | `currency` | `{"code": "PKR", "symbol": "Rs", "name": "rupees"}` / `{"code": "USD", "symbol": "$", "name": "dollars"}` | `money.py`, pre-commit guard, page wording |
-| `plan` | "moderate, 5+ years" | page header |
+| `plan` | "balanced, 3+ years" / "growth, 10+ years" | page header |
 | `cash` | "AICF" / "SGOV" | the "vs leaving it all in cash" comparison; must be a code in `funds.json` with monthly figures |
 | `index` | `{"name": "KSE-100"}` / `{"name": "S&P 500 (SPY)", "symbol": "SPY"}` | market strip; for `prices.py` also the benchmark of every non-cash holding |
 | `fred` | `{"cpi": "CPIAUCSL", "policy_rate": "FEDFUNDS"}` | `prices.py macro` only; the series ids are in the country file |
